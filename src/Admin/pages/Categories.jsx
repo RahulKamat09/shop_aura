@@ -1,14 +1,13 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Plus, Search, Edit2, Trash2 } from 'lucide-react';
 import AModal from '../components/AModal';
 import Pagination from '../components/Pagination';
-import { categories as initialCategories } from '../../data/products';
 import "../styles/admin.css"
 
 const ITEMS_PER_PAGE = 4;
 
 function Categories() {
-  const [categories, setCategories] = useState(initialCategories);
+  const [categories, setCategories] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState(null);
@@ -18,6 +17,13 @@ function Categories() {
     slug: '',
     image: ''
   });
+
+  useEffect(() => {
+    fetch('http://localhost:5000/categories')
+      .then(res => res.json())
+      .then(data => setCategories(data))
+      .catch(err => console.error(err));
+  }, []);
 
   // CRUD Operations
   const addCategory = (category) => {
@@ -94,6 +100,14 @@ function Categories() {
     }
   };
 
+  if (!categories.length) {
+    return (
+      <p style={{ padding: '2rem', textAlign: 'center' }}>
+        Loading categories...
+      </p>
+    );
+  }
+
   return (
     <div className="admin-content">
       <div className="page-header">
@@ -143,10 +157,10 @@ function Categories() {
         ))}
       </div>
 
-      <Pagination 
-        currentPage={currentPage} 
-        totalPages={totalPages} 
-        onPageChange={setCurrentPage} 
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={setCurrentPage}
       />
 
       <AModal

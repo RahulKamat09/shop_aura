@@ -1,14 +1,13 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Plus, Search, Eye, Edit2, Trash2, Package, Tag, DollarSign, FileText } from 'lucide-react';
 import AModal from '../components/AModal';
 import Pagination from '../components/Pagination';
-import { products as initialProducts, categories as initialCategories } from '../../data/products';
 
 const ITEMS_PER_PAGE = 5;
 
 function Products() {
-  const [products, setProducts] = useState(initialProducts);
-  const [categories] = useState(initialCategories);
+  const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
@@ -23,6 +22,17 @@ function Products() {
     image: '',
     status: 'In Stock'
   });
+
+  /* ---------------- FETCH DATA ---------------- */
+  useEffect(() => {
+    fetch('http://localhost:5000/products')
+      .then(res => res.json())
+      .then(data => setProducts(data));
+
+    fetch('http://localhost:5000/categories')
+      .then(res => res.json())
+      .then(data => setCategories(data.map(c => c.name)));
+  }, []);
 
   // CRUD Operations
   const addProduct = (product) => {
@@ -118,7 +128,16 @@ function Products() {
     }
   };
 
-  const uniqueCategories = [...new Set(products.map(p => p.category))];
+  const uniqueCategories = [...new Set(products?.map(p => p.category) || [])];
+
+  // 🔹 Loading state (add this just before return)
+  if (!products.length) {
+    return (
+      <p style={{ padding: '2rem', textAlign: 'center' }}>
+        Loading products...
+      </p>
+    );
+  }
 
   return (
     <div className="admin-content">
@@ -194,10 +213,10 @@ function Products() {
             ))}
           </tbody>
         </table>
-        <Pagination 
-          currentPage={currentPage} 
-          totalPages={totalPages} 
-          onPageChange={setCurrentPage} 
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
         />
       </div>
 

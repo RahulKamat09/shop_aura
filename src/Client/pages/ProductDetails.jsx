@@ -1,19 +1,42 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import Layout from '../components/layout/Layout';
-import { products } from '../../data/products';
 import { useCart } from '../context/CartContext';
 import { Star, Heart, Minus, Plus, Truck, Shield, RotateCcw } from 'lucide-react';
 import ProductCard from '../components/ProductCard';
 
 const ProductDetails = () => {
   const { id } = useParams();
-  const product = products.find(p => p.id === Number(id)) || products[0];
+  const [product, setProduct] = useState(null);
+  const [relatedProducts, setRelatedProducts] = useState([]);
   const [quantity, setQuantity] = useState(1);
-  const [selectedImage, setSelectedImage] = useState(product.image);
+  const [selectedImage, setSelectedImage] = useState(null);
   const { addToCart, addToWishlist, isInWishlist, removeFromWishlist } = useCart();
+  const [loading, setLoading] = useState(true);
 
-  const relatedProducts = products.filter(p => p.category === product.category && p.id !== product.id).slice(0, 4);
+  /* ---------------- FETCH PRODUCT BY ID ---------------- */
+  useEffect(() => {
+    setLoading(true);
+
+    fetch(`http://localhost:5000/products/${id}`)
+      .then(res => res.json())
+      .then(data => {
+        setProduct(data);
+        setSelectedImage(data.image);
+        setLoading(false);
+
+        // Fetch related products
+        fetch(
+          `http://localhost:5000/products?category=${data.category}&id_ne=${data.id}&_limit=4`
+        )
+          .then(res => res.json())
+          .then(related => setRelatedProducts(related));
+      })
+      .catch(err => {
+        console.error("Failed to fetch product:", err);
+        setLoading(false);
+      });
+  }, [id]);
 
   const handleAddToCart = () => {
     for (let i = 0; i < quantity; i++) {
@@ -29,6 +52,17 @@ const ProductDetails = () => {
       addToWishlist(product);
     }
   };
+
+  if (loading || !product) {
+    return (
+      <Layout>
+        <p style={{ textAlign: "center", padding: "4rem 0" }}>
+          Loading product details...
+        </p>
+      </Layout>
+    );
+  }
+
 
   const images = [product.image, product.hoverImage];
 

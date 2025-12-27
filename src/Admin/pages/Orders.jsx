@@ -1,19 +1,28 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Search, Eye, Package, Calendar, User, Mail, MapPin, CreditCard } from 'lucide-react';
 import AModal from '../components/AModal';
 import Pagination from '../components/Pagination';
-import { orders as initialOrders, products as initialProducts } from '../../data/products';
 
 const ITEMS_PER_PAGE = 5;
 
 function Orders() {
-  const [orders, setOrders] = useState(initialOrders);
-  const [products] = useState(initialProducts);
+  const [orders, setOrders] = useState([]);
+  const [products, setProducts] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [activeFilter, setActiveFilter] = useState('all');
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [viewingOrder, setViewingOrder] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
+
+  useEffect(() => {
+    fetch('http://localhost:5000/orders')
+      .then(res => res.json())
+      .then(data => setOrders(data));
+
+    fetch('http://localhost:5000/products')
+      .then(res => res.json())
+      .then(data => setProducts(data));
+  }, []);
 
   // CRUD Operations
   const updateOrderStatus = (id, status) => {
@@ -29,13 +38,13 @@ function Orders() {
   ];
 
   const filteredOrders = orders.filter(order => {
-    const matchesSearch = 
+    const matchesSearch =
       order.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
       order.customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       order.customer.email.toLowerCase().includes(searchTerm.toLowerCase());
-    
+
     const matchesFilter = activeFilter === 'all' || order.status.toLowerCase() === activeFilter;
-    
+
     return matchesSearch && matchesFilter;
   });
 
@@ -69,6 +78,14 @@ function Orders() {
       default: return '';
     }
   };
+
+  if (!orders.length) {
+    return (
+      <p style={{ padding: '2rem', textAlign: 'center' }}>
+        Loading orders...
+      </p>
+    );
+  }
 
   return (
     <div className="admin-content">
@@ -153,10 +170,10 @@ function Orders() {
             ))}
           </tbody>
         </table>
-        <Pagination 
-          currentPage={currentPage} 
-          totalPages={totalPages} 
-          onPageChange={setCurrentPage} 
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
         />
       </div>
 

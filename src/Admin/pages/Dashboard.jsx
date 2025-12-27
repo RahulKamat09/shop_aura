@@ -1,14 +1,40 @@
-import { useState } from 'react';
-import { DollarSign, Package, ShoppingCart, Users, TrendingUp, ArrowRight, MessageSquare } from 'lucide-react';
-import { products as initialProducts, orders as initialOrders, messages as initialMessages, customers as initialCustomers } from '../../data/products';
+import { useEffect, useState } from 'react';
+import {
+  DollarSign,
+  Package,
+  ShoppingCart,
+  Users,
+  TrendingUp,
+  ArrowRight,
+  MessageSquare
+} from 'lucide-react';
 
 function Dashboard({ onNavigate }) {
-  const [products] = useState(initialProducts);
-  const [orders] = useState(initialOrders);
-  const [messages] = useState(initialMessages);
-  const [customers] = useState(initialCustomers);
+  const [products, setProducts] = useState([]);
+  const [orders, setOrders] = useState([]);
+  const [messages, setMessages] = useState([]);
+  const [customers, setCustomers] = useState([]);
 
-  // Calculate stats
+  /* ---------------- FETCH DATA FROM db.json ---------------- */
+  useEffect(() => {
+    fetch('http://localhost:5000/products')
+      .then(res => res.json())
+      .then(data => setProducts(data));
+
+    fetch('http://localhost:5000/orders')
+      .then(res => res.json())
+      .then(data => setOrders(data));
+
+    fetch('http://localhost:5000/messages')
+      .then(res => res.json())
+      .then(data => setMessages(data));
+
+    fetch('http://localhost:5000/customers')
+      .then(res => res.json())
+      .then(data => setCustomers(data));
+  }, []);
+
+  /* ---------------- CALCULATIONS (UNCHANGED) ---------------- */
   const totalRevenue = orders.reduce((sum, o) => sum + o.total, 0);
   const pendingOrders = orders.filter(o => o.status === 'Pending').length;
   const unreadMessages = messages.filter(m => m.status === 'unread').length;
@@ -36,14 +62,14 @@ function Dashboard({ onNavigate }) {
         </div>
       </div>
 
+      {/* ---------------- STATS ---------------- */}
       <div className="stats-grid">
         <div className="stat-cards blue">
           <div className="stat-content">
             <span className="stat-labels">Total Revenue</span>
             <h2 className="stat-values">${totalRevenue.toFixed(2)}</h2>
             <div className="stat-changes positive">
-              <TrendingUp size={14} />
-              +12.5%
+              <TrendingUp size={14} /> +12.5%
             </div>
           </div>
           <div className="stat-icons blue">
@@ -55,10 +81,6 @@ function Dashboard({ onNavigate }) {
           <div className="stat-content">
             <span className="stat-labels">Total Products</span>
             <h2 className="stat-values">{products.length}</h2>
-            <div className="stat-changes positive">
-              <TrendingUp size={14} />
-              +3
-            </div>
           </div>
           <div className="stat-icons green">
             <Package size={22} />
@@ -69,7 +91,7 @@ function Dashboard({ onNavigate }) {
           <div className="stat-content">
             <span className="stat-labels">Total Orders</span>
             <h2 className="stat-values">{orders.length}</h2>
-            <p style={{ fontSize: '12px', color: 'var(--admin-text-muted)', marginTop: '4px' }}>
+            <p style={{ fontSize: '12px' }}>
               {pendingOrders} pending
             </p>
           </div>
@@ -82,10 +104,6 @@ function Dashboard({ onNavigate }) {
           <div className="stat-content">
             <span className="stat-labels">Total Customers</span>
             <h2 className="stat-values">{customers.length}</h2>
-            <div className="stat-changes positive">
-              <TrendingUp size={14} />
-              +8.2%
-            </div>
           </div>
           <div className="stat-icons purple">
             <Users size={22} />
@@ -93,6 +111,7 @@ function Dashboard({ onNavigate }) {
         </div>
       </div>
 
+      {/* ---------------- TABLES ---------------- */}
       <div className="dashboard-grid">
         <div className="dashboard-main">
           <div className="table-container">
@@ -102,6 +121,7 @@ function Dashboard({ onNavigate }) {
                 View all <ArrowRight size={16} />
               </a>
             </div>
+
             <table className="admin-table">
               <thead>
                 <tr>
@@ -129,6 +149,7 @@ function Dashboard({ onNavigate }) {
           </div>
         </div>
 
+        {/* ---------------- SIDEBAR ---------------- */}
         <div className="dashboard-sidebar">
           <div className="card messages-widget">
             <div className="card-header">
@@ -137,20 +158,18 @@ function Dashboard({ onNavigate }) {
                 <span className="new-badge">{unreadMessages} new</span>
               )}
             </div>
+
             {recentMessages.map(msg => (
               <div key={msg.id} className="mini-message">
                 <MessageSquare size={18} />
-                <div className="mini-message-content">
+                <div>
                   <h4>{msg.subject}</h4>
                   <p>{msg.sender}</p>
                 </div>
               </div>
             ))}
-            <a 
-              className="view-all-link" 
-              style={{ marginTop: '12px', display: 'inline-flex' }}
-              onClick={() => onNavigate('messages')}
-            >
+
+            <a className="view-all-link" onClick={() => onNavigate('messages')}>
               View all messages
             </a>
           </div>
@@ -159,10 +178,11 @@ function Dashboard({ onNavigate }) {
             <div className="card-header">
               <h3 className="card-title">Top Products</h3>
             </div>
+
             {topProducts.map(product => (
               <div key={product.id} className="top-product">
                 <img src={product.image} alt={product.name} />
-                <div className="top-product-info">
+                <div>
                   <h4>{product.name}</h4>
                   <p>${product.price.toFixed(2)}</p>
                 </div>

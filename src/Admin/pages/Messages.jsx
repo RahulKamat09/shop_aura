@@ -1,13 +1,12 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Search, Trash2, Circle, CheckCircle, CornerUpLeft, Eye, Send, Mail, User, Calendar } from 'lucide-react';
 import AModal from '../components/AModal';
 import Pagination from '../components/Pagination';
-import { messages as initialMessages } from '../../data/products';
 
 const ITEMS_PER_PAGE = 4;
 
 function Messages() {
-  const [messages, setMessages] = useState(initialMessages);
+  const [messages, setMessages] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [activeFilter, setActiveFilter] = useState('all');
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
@@ -15,6 +14,32 @@ function Messages() {
   const [viewingMessage, setViewingMessage] = useState(null);
   const [replyText, setReplyText] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch('http://localhost:5000/messages')
+      .then(res => res.json())
+      .then(data => {
+        // ⏳ 1 second delay
+        setTimeout(() => {
+          setMessages(data);
+          setLoading(false);
+        }, 500);
+      })
+      .catch(err => {
+        console.error(err);
+        setLoading(false);
+      });
+  }, []);
+
+
+  if (!messages.length) {
+    return (
+      <p style={{ padding: '2rem', textAlign: 'center' }}>
+        Loading messages...
+      </p>
+    );
+  }
 
   // CRUD Operations
   const deleteMessage = (id) => {
@@ -35,13 +60,13 @@ function Messages() {
   ];
 
   const filteredMessages = messages.filter(msg => {
-    const matchesSearch = 
+    const matchesSearch =
       msg.sender.toLowerCase().includes(searchTerm.toLowerCase()) ||
       msg.subject.toLowerCase().includes(searchTerm.toLowerCase()) ||
       msg.message.toLowerCase().includes(searchTerm.toLowerCase());
-    
+
     const matchesFilter = activeFilter === 'all' || msg.status === activeFilter;
-    
+
     return matchesSearch && matchesFilter;
   });
 
@@ -176,10 +201,10 @@ function Messages() {
             </div>
           ))}
         </div>
-        <Pagination 
-          currentPage={currentPage} 
-          totalPages={totalPages} 
-          onPageChange={setCurrentPage} 
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
         />
       </div>
 
@@ -255,8 +280,8 @@ function Messages() {
             <button className="btn btn-secondary" onClick={handleCloseReplyModal}>
               Cancel
             </button>
-            <button 
-              className="btn btn-primary" 
+            <button
+              className="btn btn-primary"
               onClick={handleSendReply}
               disabled={!replyText.trim()}
             >

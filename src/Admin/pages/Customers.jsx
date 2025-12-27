@@ -1,18 +1,35 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Search, Eye, Users, UserCheck, DollarSign, Mail, Phone, Calendar, ShoppingBag, MapPin } from 'lucide-react';
 import AModal from '../components/AModal';
 import Pagination from '../components/Pagination';
-import { customers as initialCustomers, orders as initialOrders } from '../../data/products';
 
 const ITEMS_PER_PAGE = 5;
 
 function Customers() {
-  const [customers] = useState(initialCustomers);
-  const [orders] = useState(initialOrders);
+  const [customers, setCustomers] = useState([]);
+  const [orders, setOrders] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [viewingCustomer, setViewingCustomer] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
+
+  useEffect(() => {
+    fetch('http://localhost:5000/customers')
+      .then(res => res.json())
+      .then(data => setCustomers(data));
+
+    fetch('http://localhost:5000/orders')
+      .then(res => res.json())
+      .then(data => setOrders(data));
+  }, []);
+
+  if (!customers.length) {
+    return (
+      <p style={{ padding: '2rem', textAlign: 'center' }}>
+        Loading customers...
+      </p>
+    );
+  }
 
   const filteredCustomers = customers.filter(c =>
     c.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -141,10 +158,10 @@ function Customers() {
             ))}
           </tbody>
         </table>
-        <Pagination 
-          currentPage={currentPage} 
-          totalPages={totalPages} 
-          onPageChange={setCurrentPage} 
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
         />
       </div>
 
