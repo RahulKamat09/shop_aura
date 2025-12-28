@@ -55,7 +55,7 @@
             "reviews": 15,
             "badge": "soldout",
             "status": "Out of Stock",
-            "category": "Electronics",
+            "category": "Footwear",
             "description": "Sleek wireless earbuds with noise isolation.",
             "fullDescription": "Featuring adaptive noise reduction, deep bass output, and 18 hour battery life, these earbuds are perfect for music, calls, workouts, and daily travel. Currently sold out due to high demand.",
             "inStock": false
@@ -71,7 +71,7 @@
             "reviews": 24,
             "badge": "sale",
             "status": "In Stock",
-            "category": "Clothing",
+            "category": "Footwear",
             "description": "Trendy denim jacket with a slim modern fit.",
             "fullDescription": "Made from premium washed denim, this jacket features durable buttons, multiple pockets, and a stylish tapered fit. A must-have layering item for all seasons.",
             "inStock": true
@@ -174,7 +174,7 @@
             "rating": 5,
             "reviews": 29,
             "status": "In Stock",
-            "category": "Electronics",
+            "category": "Footwear",
             "description": "Wi-Fi enabled security camera with night vision.",
             "fullDescription": "Offers 1080p HD video, motion alerts, 2-way audio, and night vision. Perfect for home monitoring, baby rooms, and office spaces.",
             "inStock": true
@@ -188,7 +188,7 @@
             "rating": 5,
             "reviews": 87,
             "status": "In Stock",
-            "category": "Clothing",
+            "category": "Footwear",
             "description": "Lightweight shoes designed for running and workouts.",
             "fullDescription": "Featuring cushioned soles, breathable mesh, and slip-resistant grip — perfect for gym, running, and daily activity.",
             "inStock": true
@@ -332,6 +332,13 @@
             "id": 6,
             "name": "Students",
             "slug": "/students",
+            "products": 2,
+            "image": "https://bootstrapmade.com/content/demo/eStore/assets/img/product/product-m-1.webp"
+        },
+        {
+            "id": 7,
+            "name": "Workers",
+            "slug": "/workers",
             "products": 2,
             "image": "https://bootstrapmade.com/content/demo/eStore/assets/img/product/product-m-1.webp"
         }

@@ -5,6 +5,7 @@ const CategoriesSection = () => {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  /* ---------------- FETCH CATEGORIES ---------------- */
   useEffect(() => {
     fetch("http://localhost:5000/categories")
       .then(res => res.json())
@@ -25,6 +26,7 @@ const CategoriesSection = () => {
   return (
     <section style={{ padding: "4rem 0", backgroundColor: "var(--secondary)" }}>
       <div className="container-custom">
+        {/* Header */}
         <div style={{ textAlign: "center", marginBottom: "3rem" }}>
           <h2 className="section-title">Shop by Category</h2>
           <p className="section-subtitle">
@@ -32,11 +34,13 @@ const CategoriesSection = () => {
           </p>
         </div>
 
+        {/* Category Grid */}
         <div className="grid-6">
           {categories.map((category, index) => (
             <Link
               key={category.id}
-              to={`/category/${category.name}`}
+              to="/category"
+              state={{ selectedCategory: category.name }}
               className="category-card animate-scale-in"
               style={{
                 animationDelay: `${index * 0.05}s`,
@@ -44,10 +48,11 @@ const CategoriesSection = () => {
               }}
             >
               <img src={category.image} alt={category.name} />
+
               <div className="category-overlay">
                 <h3 className="category-name">{category.name}</h3>
                 <p className="category-count">
-                  {category.products} Products
+                  {category.products ?? 0} Products
                 </p>
               </div>
             </Link>
