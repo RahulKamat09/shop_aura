@@ -392,50 +392,80 @@ textarea {
 
 
 /* ================= CATEGORY ITEM ================= */
-
 .category-item {
-  background: var(--secondary);
+  position: relative;
+  background: var(--background);
   border-radius: var(--radius);
-  padding: 2rem 1rem;
+  padding: 1.8rem 1rem;
   text-align: center;
   cursor: pointer;
-  transition: all 0.35s ease;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.75rem;
+  transition: transform 0.35s ease, box-shadow 0.35s ease;
+  overflow: hidden;
+}
+
+.category-item::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg,
+      rgba(0, 0, 0, 0.04),
+      transparent);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.category-item:hover::after {
+  opacity: 1;
 }
 
 .category-item:hover {
-  transform: translateY(-6px);
+  transform: translateY(-8px);
   box-shadow: 0 18px 40px rgba(0, 0, 0, 0.12);
 }
+
 
 /* ================= CATEGORY ICON ================= */
 
 .category-icon {
-  width: 64px;
-  height: 64px;
-  border-radius: 50%;
-  background: var(--primary);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #fff;
-  transition: all 0.35s ease;
+  margin-bottom: 0.75rem;
+  transition: transform 0.35s ease, color 0.35s ease;
 }
 
 .category-item:hover .category-icon {
-  transform: scale(1.12);
-  box-shadow: 0 0 0 8px rgba(59, 130, 246, 0.25);
+  transform: scale(1.15) rotate(3deg);
+  color: var(--primary);
 }
+
 
 /* ================= CATEGORY TEXT ================= */
 
 .category-label {
+  display: block;
   font-weight: 600;
-  font-size: 1rem;
+  transition: letter-spacing 0.3s ease, color 0.3s ease;
 }
+
+.category-item:hover .category-label {
+  letter-spacing: 0.5px;
+  color: var(--primary);
+}
+
+.category-tag {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: var(--primary);
+  color: #fff;
+  font-size: 0.7rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 999px;
+}
+
+.animate-fade-in:hover {
+  transform: translateY(-4px);
+  transition: transform 0.3s ease;
+}
+
 
 /* ================= BACK BUTTON ================= */
 
@@ -2010,4 +2040,284 @@ textarea {
   100% {
     transform: scale(1);
   }
+}
+
+
+/* About Section */
+
+/* ===== INFO CARDS (Mission / Vision / Values) ===== */
+.info-card {
+  background: var(--background);
+  padding: 2rem;
+  border-radius: var(--radius);
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.info-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.08);
+}
+
+.info-card h3 {
+  margin-bottom: 1rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.info-card p {
+  color: var(--muted-foreground);
+  line-height: 1.7;
+}
+
+
+/* ===== FEATURE / WHY CHOOSE US ===== */
+.featured-card {
+  background: var(--secondary);
+  padding: 2rem;
+  border-radius: var(--radius);
+  transition: all 0.3s ease;
+}
+
+.featured-card:hover {
+  background: var(--background);
+  transform: translateY(-6px);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.08);
+}
+
+.featured-card h4 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+}
+
+.featured-card p {
+  color: var(--muted-foreground);
+  font-size: 0.95rem;
+}
+
+
+/* ===== TIMELINE ===== */
+.timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-top: 3rem;
+}
+
+.timeline-item {
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+  background: var(--background);
+  padding: 1.5rem;
+  border-radius: var(--radius);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.05);
+  transition: 0.3s ease-in;
+}
+
+.timeline-item span {
+  font-weight: 700;
+  font-size: 1.25rem;
+  color: var(--primary);
+  min-width: 70px;
+}
+
+.timeline-item p {
+  color: var(--muted-foreground);
+}
+
+.timeline-item:hover {
+  transform: translateX(10px);
+  box-shadow: 2px 2px 6px var(--primary);
+}
+
+
+/* ===== TESTIMONIALS ===== */
+.testimonial-card {
+  background: var(--secondary);
+  padding: 2rem;
+  border-radius: var(--radius);
+  position: relative;
+  transition: transform 0.3s ease;
+}
+
+.testimonial-card:hover {
+  transform: translateY(-6px);
+}
+
+.testimonial-card p {
+  font-style: italic;
+  color: var(--muted-foreground);
+  margin-bottom: 1rem;
+}
+
+.testimonial-card h4 {
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+
+/* ===== CTA BUTTON LIGHT ===== */
+.btn-light {
+  display: inline-block;
+  background: #fff;
+  color: var(--primary);
+  padding: 0.75rem 2rem;
+  border-radius: var(--radius);
+  font-weight: 600;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.btn-light:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+/* ===== UNIVERSAL GRID CENTERING FIX ===== */
+.containered-custom {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.griid-3 {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 2rem;
+  align-items: stretch;
+  justify-items: center;
+  /* 👈 THIS centers cards */
+}
+
+.griid-3>* {
+  width: 100%;
+  max-width: 360px;
+  /* 👈 prevents stretched cards */
+}
+
+/* Category badge add on */
+
+.category-badges {
+  display: flex;
+  justify-content: center;
+  /* center horizontally */
+  align-items: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 2rem;
+}
+
+.category-badge {
+  background: var(--secondary);
+  padding: 0.45rem 0.9rem;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: inherit;
+  transition: all 0.3s ease;
+  cursor: default;
+}
+
+.category-badge:hover {
+  background: var(--primary);
+  color: #fff;
+  transform: translateY(-2px);
+}
+
+.category-intro {
+  max-width: 900px;
+  margin: 0 auto 2rem;
+  /* center horizontally + spacing below */
+  text-align: center;
+  color: var(--admin-sidebar-bg);
+  line-height: 1.7;
+  font-size: 1.2rem;
+}
+
+/* Pagination */
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 3rem;
+}
+
+.pagination button {
+  padding: 0.45rem 0.9rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--background);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.pagination button:hover:not(:disabled) {
+  background: var(--primary);
+  color: #fff;
+}
+
+.pagination button.active {
+  background: var(--primary);
+  color: #fff;
+  font-weight: 600;
+}
+
+.pagination button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Sub and Main Category CSS */
+
+/* MAIN CATEGORY (MEN / WOMEN) */
+.main-category-tabs {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.main-tab {
+  padding: 0.6rem 1.5rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: transparent;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.main-tab.active,
+.main-tab:hover {
+  background: var(--primary);
+  color: #fff;
+}
+
+/* SUBCATEGORY */
+.sub-category-tabs {
+  display: flex;
+  justify-content: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-bottom: 2rem;
+}
+
+.sub-tab {
+  padding: 0.45rem 1rem;
+  border-radius: 999px;
+  background: var(--secondary);
+  border: none;
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: all 0.3s ease;
+}
+
+.sub-tab.active,
+.sub-tab:hover {
+  background: var(--primary);
+  color: #fff;
 }

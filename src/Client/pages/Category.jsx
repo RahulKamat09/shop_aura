@@ -15,12 +15,16 @@ const categoryIcons = {
   Default: House
 };
 
+const ITEMS_PER_PAGE = 8;
+
 const Category = () => {
   const location = useLocation();
   const [viewMode, setViewMode] = useState("grid");
   const [sortBy, setSortBy] = useState("default");
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [showCategories, setShowCategories] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [gender, setGender] = useState("Men");
 
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState(["All"]);
@@ -36,6 +40,11 @@ const Category = () => {
     }
   }, [location.state]);
 
+  /* ---------------- RESET PAGE ---------------- */
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedCategory, sortBy]);
+
   /* ---------------- FETCH CATEGORIES ---------------- */
   useEffect(() => {
     fetch("http://localhost:5000/categories")
@@ -50,9 +59,14 @@ const Category = () => {
   useEffect(() => {
     if (showCategories) return;
 
-    let url = "http://localhost:5000/products";
+    let url = "http://localhost:5000/products?";
+
     if (selectedCategory !== "All") {
-      url += `?category=${selectedCategory}`;
+      url += `category=${selectedCategory}&`;
+    }
+
+    if (gender) {
+      url += `gender=${gender}`;
     }
 
     setLoading(true);
@@ -66,12 +80,19 @@ const Category = () => {
         console.error("Failed to fetch products:", err);
         setLoading(false);
       });
-  }, [selectedCategory, showCategories]);
+  }, [selectedCategory, gender, showCategories]);
+
 
   /* ---------------- FILTER + SORT ---------------- */
   const filteredProducts = products.filter(p => {
-    return p.price >= priceRange.min && p.price <= priceRange.max;
+    return (
+      p.gender === gender &&
+      p.price >= priceRange.min &&
+      p.price <= priceRange.max
+    );
   });
+
+
 
   const sortedProducts = [...filteredProducts].sort((a, b) => {
     switch (sortBy) {
@@ -85,6 +106,14 @@ const Category = () => {
         return 0;
     }
   });
+
+  /* ---------------- PAGINATION ---------------- */
+  const totalPages = Math.ceil(sortedProducts.length / ITEMS_PER_PAGE);
+
+  const paginatedProducts = sortedProducts.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
 
   return (
     <Layout>
@@ -118,6 +147,49 @@ const Category = () => {
       </div>
 
       <div className="container-custom" style={{ padding: "2rem 0" }}>
+
+        <p className="category-intro">
+          Explore our curated collection of products across multiple categories.
+          Each category is carefully selected to offer quality, value, and modern design
+          tailored to your everyday needs.
+        </p>
+
+        <div className="category-badges">
+          <span className="category-badge">✔ Verified Products</span>
+          <span className="category-badge">🚚 Fast Delivery</span>
+          <span className="category-badge">🔒 Secure Payments</span>
+        </div>
+
+        {/* Category According to gender */}
+        {showCategories && (
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              gap: "1rem",
+              marginBottom: "2rem"
+            }}
+          >
+            {["Men", "Women"].map(item => (
+              <button
+                key={item}
+                onClick={() => setGender(item)}
+                style={{
+                  padding: "0.5rem 1.5rem",
+                  borderRadius: "999px",
+                  border: "1px solid var(--border)",
+                  backgroundColor: gender === item ? "var(--primary)" : "transparent",
+                  color: gender === item ? "#fff" : "inherit",
+                  cursor: "pointer",
+                  fontWeight: "500"
+                }}
+              >
+                {item}
+              </button>
+            ))}
+          </div>
+        )}
+
         {/* ================= CATEGORY CARDS ================= */}
         {showCategories && (
           <>
@@ -137,6 +209,16 @@ const Category = () => {
                       setShowCategories(false);
                     }}
                   >
+                    {/* BADGE */}
+                    {cat === "Electronics" && (
+                      <span className="category-tag">Popular</span>
+                    )}
+
+                    {cat === "Fashion" && (
+                      <span className="category-tag" style={{ background: "#22c55e" }}>
+                        New
+                      </span>
+                    )}
                     {/* ICON */}
                     <div className="category-icon">
                       <Icon size={30} />
@@ -238,7 +320,7 @@ const Category = () => {
             ) : (
               <>
                 <div className={viewMode === "grid" ? "grid-4" : "grid-2"}>
-                  {sortedProducts.map((product, index) => (
+                  {paginatedProducts.map((product, index) => (
                     <div
                       key={product.id}
                       className="animate-fade-in"
@@ -248,6 +330,35 @@ const Category = () => {
                     </div>
                   ))}
                 </div>
+
+                {/* Pagination */}
+                {totalPages > 1 && (
+                  <div className="pagination">
+                    <button
+                      disabled={currentPage === 1}
+                      onClick={() => setCurrentPage(p => p - 1)}
+                    >
+                      Prev
+                    </button>
+
+                    {[...Array(totalPages)].map((_, i) => (
+                      <button
+                        key={i}
+                        className={currentPage === i + 1 ? "active" : ""}
+                        onClick={() => setCurrentPage(i + 1)}
+                      >
+                        {i + 1}
+                      </button>
+                    ))}
+
+                    <button
+                      disabled={currentPage === totalPages}
+                      onClick={() => setCurrentPage(p => p + 1)}
+                    >
+                      Next
+                    </button>
+                  </div>
+                )}
 
                 {sortedProducts.length === 0 && (
                   <p style={{ textAlign: "center", marginTop: "3rem" }}>
