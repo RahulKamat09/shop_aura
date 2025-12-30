@@ -18,9 +18,16 @@ function Products() {
     name: '',
     price: '',
     category: '',
+    gender: '',
     description: '',
+    fullDescription: '',
     image: '',
-    status: 'In Stock'
+    hoverImage: '',
+    badge: '',
+    rating: 5,
+    reviews: 0,
+    status: 'In Stock',
+    inStock: true
   });
 
   /* ---------------- FETCH DATA ---------------- */
@@ -35,20 +42,52 @@ function Products() {
   }, []);
 
   // CRUD Operations
-  const addProduct = (product) => {
-    const newProduct = {
-      ...product,
-      id: Math.max(...products.map(p => p.id), 0) + 1
-    };
-    setProducts([...products, newProduct]);
+  const addProduct = async (product) => {
+    try {
+      const res = await fetch('http://localhost:5000/products', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(product)
+      });
+
+      const newProduct = await res.json();
+      setProducts([...products, newProduct]);
+    } catch (error) {
+      console.error('Failed to add product', error);
+    }
   };
 
-  const updateProduct = (id, updatedProduct) => {
-    setProducts(products.map(p => p.id === id ? { ...p, ...updatedProduct } : p));
+
+  const updateProduct = async (id, updatedProduct) => {
+    try {
+      const res = await fetch(`http://localhost:5000/products/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ ...updatedProduct, id })
+      });
+
+      const data = await res.json();
+
+      setProducts(products.map(p => p.id === id ? data : p));
+    } catch (error) {
+      console.error('Failed to update product', error);
+    }
   };
 
-  const deleteProduct = (id) => {
-    setProducts(products.filter(p => p.id !== id));
+  const deleteProduct = async (id) => {
+    try {
+      await fetch(`http://localhost:5000/products/${id}`, {
+        method: 'DELETE'
+      });
+
+      setProducts(products.filter(p => p.id !== id));
+    } catch (error) {
+      console.error('Failed to delete product', error);
+    }
   };
 
   const filteredProducts = products.filter(p =>
@@ -70,20 +109,36 @@ function Products() {
         name: product.name,
         price: product.price.toString(),
         category: product.category,
+        gender: product.gender || '',
         description: product.description || '',
-        image: product.image,
-        status: product.status
+        fullDescription: product.fullDescription || '',
+        image: product.image || '',
+        hoverImage: product.hoverImage || '',
+        badge: product.badge || '',
+        rating: product.rating || 5,
+        reviews: product.reviews || 0,
+        status: product.status,
+        inStock: product.inStock
       });
+
     } else {
       setEditingProduct(null);
       setFormData({
         name: '',
         price: '',
         category: '',
+        gender: '',
         description: '',
+        fullDescription: '',
         image: '',
-        status: 'In Stock'
+        hoverImage: '',
+        badge: '',
+        rating: 5,
+        reviews: 0,
+        status: 'In Stock',
+        inStock: true
       });
+
     }
     setIsModalOpen(true);
   };
@@ -108,10 +163,18 @@ function Products() {
       name: formData.name,
       price: parseFloat(formData.price),
       category: formData.category,
+      gender: formData.gender,
       description: formData.description,
+      fullDescription: formData.fullDescription,
       image: formData.image,
-      status: formData.status
+      hoverImage: formData.hoverImage,
+      badge: formData.badge,
+      rating: Number(formData.rating),
+      reviews: Number(formData.reviews),
+      status: formData.inStock ? 'In Stock' : 'Out of Stock',
+      inStock: formData.inStock
     };
+
 
     if (editingProduct) {
       updateProduct(editingProduct.id, productData);
@@ -121,6 +184,7 @@ function Products() {
 
     handleCloseModal();
   };
+
 
   const handleDelete = (id) => {
     if (window.confirm('Are you sure you want to delete this product?')) {
@@ -354,6 +418,30 @@ function Products() {
         </div>
 
         <div className="form-group">
+          <label className="form-label">Full Description</label>
+          <textarea
+            className="form-textarea"
+            placeholder="Detailed product description"
+            value={formData.fullDescription}
+            onChange={(e) => setFormData({ ...formData, fullDescription: e.target.value })}
+          />
+        </div>
+
+        <div className="form-group">
+          <label className="form-label">Badge</label>
+          <select
+            className="form-select"
+            value={formData.badge}
+            onChange={(e) => setFormData({ ...formData, badge: e.target.value })}
+          >
+            <option value="">None</option>
+            <option value="new">New</option>
+            <option value="sale">Sale</option>
+            <option value="hot">Hot</option>
+          </select>
+        </div>
+
+        <div className="form-group">
           <label className="form-label">Image URL</label>
           <input
             type="text"
@@ -362,6 +450,31 @@ function Products() {
             value={formData.image}
             onChange={(e) => setFormData({ ...formData, image: e.target.value })}
           />
+        </div>
+
+        <div className="form-group">
+          <label className="form-label">Hover Image URL</label>
+          <input
+            type="text"
+            className="form-input"
+            placeholder="https://..."
+            value={formData.hoverImage}
+            onChange={(e) => setFormData({ ...formData, hoverImage: e.target.value })}
+          />
+        </div>
+
+        <div className="form-group">
+          <label className="form-label">Gender</label>
+          <select
+            className="form-select"
+            value={formData.gender}
+            onChange={(e) => setFormData({ ...formData, gender: e.target.value })}
+          >
+            <option value="">Select Gender</option>
+            <option value="Men">Men</option>
+            <option value="Women">Women</option>
+            <option value="Unisex">Unisex</option>
+          </select>
         </div>
 
         <div className="form-checkbox">
@@ -373,6 +486,7 @@ function Products() {
           />
           <label htmlFor="inStock">In Stock</label>
         </div>
+
       </AModal>
     </div>
   );
