@@ -930,22 +930,6 @@
       "description": "Complete fitness kit for home-based workouts.",
       "fullDescription": "Includes resistance bands, skipping rope, push-up bars, and essential workout accessories—ideal for full-body training at home.",
       "inStock": true
-    },
-    {
-      "id": "5292",
-      "name": "Mouse",
-      "price": 121,
-      "category": "Electronics",
-      "gender": "",
-      "description": "fgfgfgfgfgfgfgfgfgfg",
-      "fullDescription": "fgfgfgfgfgfgffgfg",
-      "image": "",
-      "hoverImage": "",
-      "badge": "new",
-      "rating": 5,
-      "reviews": 0,
-      "status": "In Stock",
-      "inStock": true
     }
   ],
   "categories": [
@@ -953,21 +937,21 @@
       "id": "1",
       "name": "Clothing",
       "slug": "/clothing",
-      "products": 4,
+      "products": 10,
       "image": "https://bootstrapmade.com/content/demo/eStore/assets/img/product/product-1.webp"
     },
     {
       "id": "2",
       "name": "Accessories",
       "slug": "/accessories",
-      "products": 8,
+      "products": 10,
       "image": "https://bootstrapmade.com/content/demo/eStore/assets/img/product/product-6.webp"
     },
     {
       "id": "3",
       "name": "Footwear",
       "slug": "/footwear",
-      "products": 4,
+      "products": 10,
       "image": "https://bootstrapmade.com/content/demo/eStore/assets/img/product/product-9.webp"
     },
     {
@@ -975,21 +959,21 @@
       "name": "Electronics",
       "slug": "/electronics",
       "gender": "men",
-      "products": 13,
+      "products": 10,
       "image": "https://bootstrapmade.com/content/demo/eStore/assets/img/product/product-f-1.webp"
     },
     {
       "id": "5",
       "name": "Sports",
       "slug": "/sports",
-      "products": 5,
+      "products": 10,
       "image": "https://bootstrapmade.com/content/demo/eStore/assets/img/product/product-10.webp"
     },
     {
       "id": "6",
       "name": "Students",
       "slug": "/students",
-      "products": 2,
+      "products": 10,
       "image": "https://bootstrapmade.com/content/demo/eStore/assets/img/product/product-m-1.webp"
     }
   ],
