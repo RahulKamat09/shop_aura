@@ -11,6 +11,7 @@ import Wishlist from "./Client/pages/Wishlist";
 import Profile from "./Client/pages/Profile";
 import NotFound from "./Client/pages/NotFound";
 import AdminApp from "./Admin/AdminApp";
+import AuthPage from "./Client/components/auth/AuthPage";
 
 const App = () => (
   <CartProvider>
@@ -26,6 +27,7 @@ const App = () => (
         <Route path="/wishlist" element={<Wishlist />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/admin/*" element={<AdminApp />} />
+        <Route path="/auth" element={<AuthPage />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
