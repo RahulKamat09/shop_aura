@@ -1,19 +1,20 @@
+import api from "../../api/api";
 import { useEffect, useState } from "react";
 import Layout from "../components/layout/Layout";
 import ProductCard from "../components/ProductCard";
 import { Link, useLocation } from "react-router-dom";
-import { Grid, List, House, Laptop, Shirt, Watch, Footprints, ShoppingBag, Medal, School } from "lucide-react";
+import { Grid, List, House } from "lucide-react";
 
-const categoryIcons = {
-  Electronics: Laptop,
-  Fashion: Shirt,
-  Accessories: Watch,
-  Footwear: Footprints,
-  Clothing: ShoppingBag,
-  Sports: Medal,
-  Students: School,
-  Default: House
-};
+// const categoryIcons = {
+//   Electronics: Laptop,
+//   Fashion: Shirt,
+//   Accessories: Watch,
+//   Footwear: Footprints,
+//   Clothing: ShoppingBag,
+//   Sports: Medal,
+//   Students: School,
+//   Default: House
+// };
 
 const ITEMS_PER_PAGE = 8;
 
@@ -24,7 +25,7 @@ const Category = () => {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [showCategories, setShowCategories] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
-  const [gender, setGender] = useState("Men");
+  const [gender, setGender] = useState(null);
 
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState(["All"]);
@@ -47,51 +48,62 @@ const Category = () => {
 
   /* ---------------- FETCH CATEGORIES ---------------- */
   useEffect(() => {
-    fetch("http://localhost:5000/categories")
-      .then(res => res.json())
-      .then(data => {
-        setCategories(["All", ...data.map(cat => cat.name)]);
-      })
-      .catch(err => console.error(err));
+    const fetchCategories = async () => {
+      try {
+        const res = await api.get("/categories");
+        setCategories([{ name: "All" }, ...res.data]);
+      } catch (error) {
+        console.error("Failed to fetch categories:", error);
+      }
+    };
+
+    fetchCategories();
   }, []);
+
 
   /* ---------------- FETCH PRODUCTS ---------------- */
   useEffect(() => {
     if (showCategories) return;
 
-    let url = "http://localhost:5000/products?";
+    const fetchProducts = async () => {
+      try {
+        setLoading(true);
 
-    if (selectedCategory !== "All") {
-      url += `category=${selectedCategory}&`;
-    }
+        const params = {};
+        if (selectedCategory !== "All") params.category = selectedCategory;
+        if (gender) {
+          params.gender = [gender, "All"];
+        }
+        // if gender is null → no gender param → fetch all
 
-    if (gender) {
-      url += `gender=${gender}`;
-    }
-
-    setLoading(true);
-    fetch(url)
-      .then(res => res.json())
-      .then(data => {
-        setProducts(data);
+        const res = await api.get("/products", { params });
+        setProducts(res.data);
+      } catch (error) {
+        console.error("Failed to fetch products:", error);
+      } finally {
         setLoading(false);
-      })
-      .catch(err => {
-        console.error("Failed to fetch products:", err);
-        setLoading(false);
-      });
+      }
+    };
+
+    fetchProducts();
   }, [selectedCategory, gender, showCategories]);
+
 
 
   /* ---------------- FILTER + SORT ---------------- */
   const filteredProducts = products.filter(p => {
+    const genderMatch =
+      !gender ||                 // user did NOT select gender
+      !p.gender ||               // product has no gender
+      p.gender === "All" ||      // unisex product
+      p.gender === gender;       // men / women match
+
     return (
-      p.gender === gender &&
+      genderMatch &&
       p.price >= priceRange.min &&
       p.price <= priceRange.max
     );
   });
-
 
 
   const sortedProducts = [...filteredProducts].sort((a, b) => {
@@ -161,7 +173,7 @@ const Category = () => {
         </div>
 
         {/* Category According to gender */}
-        {showCategories && (
+        {!showCategories && (
           <div
             style={{
               display: "flex",
@@ -173,7 +185,9 @@ const Category = () => {
             {["Men", "Women"].map(item => (
               <button
                 key={item}
-                onClick={() => setGender(item)}
+                onClick={() =>
+                  setGender(prev => (prev === item ? null : item))
+                }
                 style={{
                   padding: "0.5rem 1.5rem",
                   borderRadius: "999px",
@@ -196,42 +210,53 @@ const Category = () => {
             <h2 style={{ marginBottom: "1.5rem" }}>Browse Categories</h2>
 
             <div className="grid-4">
-              {categories.map((cat, index) => {
-                const Icon = categoryIcons[cat] || categoryIcons.Default;
+              {categories.map((cat, index) => (
+                <div
+                  key={cat.name}
+                  className="category-item animate-fade-in"
+                  style={{ animationDelay: `${index * 0.05}s` }}
+                  onClick={() => {
+                    setSelectedCategory(cat.name);
+                    setShowCategories(false);
+                  }}
+                >
+                  {/* BADGES */}
+                  {cat.name === "Electronics" && (
+                    <span className="category-tag">Popular</span>
+                  )}
 
-                return (
-                  <div
-                    key={cat}
-                    className="category-item animate-fade-in"
-                    style={{ animationDelay: `${index * 0.05}s` }}
-                    onClick={() => {
-                      setSelectedCategory(cat);
-                      setShowCategories(false);
-                    }}
-                  >
-                    {/* BADGE */}
-                    {cat === "Electronics" && (
-                      <span className="category-tag">Popular</span>
+                  {cat.name === "Fashion" && (
+                    <span
+                      className="category-tag"
+                      style={{ background: "#22c55e" }}
+                    >
+                      New
+                    </span>
+                  )}
+
+                  {/* CATEGORY IMAGE */}
+                  <div className="category-image-wrapper">
+                    {cat.name === "All" ? (
+                      <div className="category-all-icon">
+                        <House size={36} />
+                      </div>
+                    ) : (
+                      <img
+                        src={cat.image || "/placeholder-category.jpg"}
+                        alt={cat.name}
+                        className="category-image"
+                      />
                     )}
-
-                    {cat === "Fashion" && (
-                      <span className="category-tag" style={{ background: "#22c55e" }}>
-                        New
-                      </span>
-                    )}
-                    {/* ICON */}
-                    <div className="category-icon">
-                      <Icon size={30} />
-                    </div>
-
-                    {/* CATEGORY LABEL */}
-                    <span className="category-label">{cat}</span>
                   </div>
-                );
-              })}
+
+                  {/* CATEGORY LABEL */}
+                  <span className="category-label">{cat.name}</span>
+                </div>
+              ))}
             </div>
           </>
         )}
+
 
         {/* ================= PRODUCTS VIEW ================= */}
         {!showCategories && (

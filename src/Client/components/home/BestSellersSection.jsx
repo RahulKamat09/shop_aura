@@ -1,3 +1,4 @@
+import api from "../../../api/api";
 import { useEffect, useState } from "react";
 import ProductCard from "../ProductCard";
 
@@ -6,19 +7,27 @@ const BestSellersSection = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch(
-      "http://localhost:5000/products?_sort=rating&_order=desc&_limit=4"
-    )
-      .then(res => res.json())
-      .then(data => {
-        setBestSellers(data);
+    const fetchBestSellers = async () => {
+      try {
+        setLoading(true);
+        const res = await api.get("/products", {
+          params: {
+            _sort: "rating",
+            _order: "desc",
+            _limit: 4
+          }
+        });
+        setBestSellers(res.data);
+      } catch (error) {
+        console.error("Failed to fetch best sellers:", error);
+      } finally {
         setLoading(false);
-      })
-      .catch(err => {
-        console.error("Failed to fetch best sellers:", err);
-        setLoading(false);
-      });
+      }
+    };
+
+    fetchBestSellers();
   }, []);
+
 
   if (loading) {
     return <p style={{ textAlign: "center" }}>Loading best sellers...</p>;

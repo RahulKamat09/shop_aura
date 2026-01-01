@@ -1,3 +1,4 @@
+import api from "../../../api/api";
 import { useEffect, useState } from "react";
 import ProductCard from "../ProductCard";
 
@@ -9,25 +10,29 @@ const ProductsSection = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    let url = "http://localhost:5000/products";
+    const fetchProducts = async () => {
+      try {
+        setLoading(true);
 
-    // Filter by category when tab is not "All"
-    if (activeTab !== "All") {
-      url += `?category=${activeTab}`;
-    }
+        const params = {};
+        if (activeTab !== "All") {
+          params.category = activeTab;
+        }
 
-    fetch(url)
-      .then(res => res.json())
-      .then(data => {
-        // Optional: skip first 4 if you want same behavior as before
-        setProducts(activeTab === "All" ? data.slice(4) : data);
+        const res = await api.get("/products", { params });
+
+        // Show only 12 products
+        setProducts(res.data.slice(0, 12));
+      } catch (error) {
+        console.error("Failed to fetch products:", error);
+      } finally {
         setLoading(false);
-      })
-      .catch(err => {
-        console.error("Failed to fetch products:", err);
-        setLoading(false);
-      });
+      }
+    };
+
+    fetchProducts();
   }, [activeTab]);
+
 
   if (loading) {
     return <p style={{ textAlign: "center" }}>Loading products...</p>;

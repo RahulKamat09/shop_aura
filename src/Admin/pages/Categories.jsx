@@ -1,3 +1,4 @@
+import api from "../../api/api";
 import { useEffect, useState } from 'react';
 import { Plus, Search, Edit2, Trash2 } from 'lucide-react';
 import AModal from '../components/AModal';
@@ -12,6 +13,8 @@ function Categories() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [loading, setLoading] = useState(true);
+  const [products, setProducts] = useState([]);
   const [formData, setFormData] = useState({
     name: '',
     slug: '',
@@ -19,28 +22,69 @@ function Categories() {
   });
 
   useEffect(() => {
-    fetch('http://localhost:5000/categories')
-      .then(res => res.json())
-      .then(data => setCategories(data))
-      .catch(err => console.error(err));
+    api.get("/products").then(res => setProducts(res.data));
   }, []);
 
+
+  useEffect(() => {
+    fetchCategories();
+  }, []);
+
+  const fetchCategories = async () => {
+    try {
+      setLoading(true);
+      const res = await api.get("/categories");
+      setCategories(res.data);
+    } catch (error) {
+      console.error("Failed to fetch categories", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getProductCount = (categoryName) => {
+    return products.filter(p => p.category === categoryName).length;
+  };
+
+
+
   // CRUD Operations
-  const addCategory = (category) => {
-    const newCategory = {
-      ...category,
-      id: Math.max(...categories.map(c => c.id), 0) + 1
-    };
-    setCategories([...categories, newCategory]);
+  const addCategory = async (category) => {
+    try {
+      setLoading(true);
+      await api.post("/categories", category);
+      await fetchCategories();
+    } catch (error) {
+      console.error("Failed to add category", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const updateCategory = (id, updatedCategory) => {
-    setCategories(categories.map(c => c.id === id ? { ...c, ...updatedCategory } : c));
+  const updateCategory = async (id, updatedCategory) => {
+    try {
+      setLoading(true);
+      await api.put(`/categories/${id}`, { ...updatedCategory, id });
+      await fetchCategories();
+    } catch (error) {
+      console.error("Failed to update category", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const deleteCategory = (id) => {
-    setCategories(categories.filter(c => c.id !== id));
+  const deleteCategory = async (id) => {
+    try {
+      setLoading(true);
+      await api.delete(`/categories/${id}`);
+      await fetchCategories();
+    } catch (error) {
+      console.error("Failed to delete category", error);
+    } finally {
+      setLoading(false);
+    }
   };
+
 
   const filteredCategories = categories.filter(c =>
     c.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -82,8 +126,9 @@ function Categories() {
       name: formData.name,
       slug: formData.slug || `/${formData.name.toLowerCase().replace(/\s+/g, '-')}`,
       image: formData.image,
-      products: editingCategory?.product || 0
+      products: editingCategory?.products ?? 0
     };
+
 
     if (editingCategory) {
       updateCategory(editingCategory.id, categoryData);
@@ -91,22 +136,59 @@ function Categories() {
       addCategory(categoryData);
     }
 
+
     handleCloseModal();
   };
 
-  const handleDelete = (id) => {
-    if (window.confirm('Are you sure you want to delete this category?')) {
-      deleteCategory(id);
+  const handleDelete = async (category) => {
+    try {
+      const relatedProducts = products.filter(
+        p => p.category === category.name
+      );
+
+      const count = relatedProducts.length;
+
+      const message =
+        count > 0
+          ? `This category has ${count} products.\n\nIf you delete this category, ALL related products will also be deleted.\n\nDo you want to continue?`
+          : "Are you sure you want to delete this category?";
+
+      if (!window.confirm(message)) return;
+
+      setLoading(true);
+
+      // delete products first
+      if (count > 0) {
+        await Promise.all(
+          relatedProducts.map(p =>
+            api.delete(`/products/${p.id}`)
+          )
+        );
+      }
+
+      // delete category
+      await api.delete(`/categories/${category.id}`);
+
+      // refresh data
+      await fetchCategories();
+      const productsRes = await api.get("/products");
+      setProducts(productsRes.data);
+
+    } catch (error) {
+      console.error("Failed to delete category with products", error);
+    } finally {
+      setLoading(false);
     }
   };
 
-  if (!categories.length) {
+  if (loading) {
     return (
-      <p style={{ padding: '2rem', textAlign: 'center' }}>
+      <p style={{ padding: "2rem", textAlign: "center" }}>
         Loading categories...
       </p>
     );
   }
+
 
   return (
     <div className="admin-content">
@@ -139,7 +221,7 @@ function Categories() {
               <img src={category.image} alt={category.name} />
               <div className="category-overlay">
                 <h3>{category.name}</h3>
-                <p>{category.products} products</p>
+                <p>{getProductCount(category.name)} products</p>
               </div>
             </div>
             <div className="category-footer">
@@ -148,7 +230,7 @@ function Categories() {
                 <button className="btn-icon" onClick={() => handleOpenModal(category)}>
                   <Edit2 size={18} />
                 </button>
-                <button className="btn-icon danger" onClick={() => handleDelete(category.id)}>
+                <button className="btn-icon danger" onClick={() => handleDelete(category)}>
                   <Trash2 size={18} />
                 </button>
               </div>
@@ -172,9 +254,10 @@ function Categories() {
             <button className="btn btn-secondary" onClick={handleCloseModal}>
               Cancel
             </button>
-            <button className="btn btn-primary" onClick={handleSubmit}>
-              {editingCategory ? 'Update Category' : 'Add Category'}
+            <button className="btn btn-primary" onClick={handleSubmit} disabled={loading}>
+              {loading ? "Saving..." : editingCategory ? "Update Category" : "Add Category"}
             </button>
+
           </>
         }
       >

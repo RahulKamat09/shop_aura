@@ -1,20 +1,20 @@
 {
   "products": [
     {
-      "id": "1",
       "name": "Men’s Premium Cotton Casual Shirt",
-      "price": 89.99,
-      "image": "https://m.media-amazon.com/images/I/51jT9G0QYhL._SY741_.jpg",
-      "hoverImage": "https://m.media-amazon.com/images/I/51wuz9qs2RL._SY741_.jpg",
-      "rating": 4,
-      "reviews": 42,
-      "badge": "new",
-      "status": "In Stock",
-      "gender": "Men",
+      "price": 87.99,
       "category": "Clothing",
+      "gender": "Men",
       "description": "Smart casual cotton shirt designed for men’s everyday comfort.",
       "fullDescription": "Made from breathable premium cotton, this men’s casual shirt offers a tailored fit with long-lasting comfort. Ideal for office wear, casual outings, and daily styling.",
-      "inStock": true
+      "image": "https://m.media-amazon.com/images/I/51jT9G0QYhL._SY741_.jpg",
+      "hoverImage": "https://m.media-amazon.com/images/I/51wuz9qs2RL._SY741_.jpg",
+      "badge": "sale",
+      "rating": 4,
+      "reviews": 42,
+      "status": "In Stock",
+      "inStock": true,
+      "id": "1"
     },
     {
       "id": "2",
@@ -930,6 +930,22 @@
       "description": "Complete fitness kit for home-based workouts.",
       "fullDescription": "Includes resistance bands, skipping rope, push-up bars, and essential workout accessories—ideal for full-body training at home.",
       "inStock": true
+    },
+    {
+      "id": "5292",
+      "name": "Mouse",
+      "price": 121,
+      "category": "Electronics",
+      "gender": "",
+      "description": "fgfgfgfgfgfgfgfgfgfg",
+      "fullDescription": "fgfgfgfgfgfgffgfg",
+      "image": "",
+      "hoverImage": "",
+      "badge": "new",
+      "rating": 5,
+      "reviews": 0,
+      "status": "In Stock",
+      "inStock": true
     }
   ],
   "categories": [
@@ -958,14 +974,15 @@
       "id": "4",
       "name": "Electronics",
       "slug": "/electronics",
-      "products": 12,
+      "gender": "men",
+      "products": 13,
       "image": "https://bootstrapmade.com/content/demo/eStore/assets/img/product/product-f-1.webp"
     },
     {
       "id": "5",
       "name": "Sports",
       "slug": "/sports",
-      "products": 4,
+      "products": 5,
       "image": "https://bootstrapmade.com/content/demo/eStore/assets/img/product/product-10.webp"
     },
     {

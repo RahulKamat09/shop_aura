@@ -1,3 +1,4 @@
+import api from '../../api/api';
 import { useEffect, useState } from 'react';
 import { Plus, Search, Eye, Edit2, Trash2, Package, Tag, DollarSign, FileText } from 'lucide-react';
 import AModal from '../components/AModal';
@@ -8,6 +9,7 @@ const ITEMS_PER_PAGE = 5;
 function Products() {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
@@ -15,6 +17,7 @@ function Products() {
   const [viewingProduct, setViewingProduct] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [formData, setFormData] = useState({
+    id: '',
     name: '',
     price: '',
     category: '',
@@ -30,65 +33,75 @@ function Products() {
     inStock: true
   });
 
+
   /* ---------------- FETCH DATA ---------------- */
   useEffect(() => {
-    fetch('http://localhost:5000/products')
-      .then(res => res.json())
-      .then(data => setProducts(data));
-
-    fetch('http://localhost:5000/categories')
-      .then(res => res.json())
-      .then(data => setCategories(data.map(c => c.name)));
+    fetchInitialData();
   }, []);
+
+  const fetchInitialData = async () => {
+    try {
+      setLoading(true);
+      const [productsRes, categoriesRes] = await Promise.all([
+        api.get('/products'),
+        api.get('/categories')
+      ]);
+
+      setProducts(productsRes.data);
+      setCategories(categoriesRes.data.map(c => c.name));
+    } catch (error) {
+      console.error('Failed to fetch data', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // CRUD Operations
   const addProduct = async (product) => {
     try {
-      const res = await fetch('http://localhost:5000/products', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(product)
-      });
+      await api.post("/products", product);
 
-      const newProduct = await res.json();
-      setProducts([...products, newProduct]);
+      // find category
+      const categoryRes = await api.get(
+        `/categories?name=${product.category}`
+      );
+
+      if (categoryRes.data.length) {
+        const category = categoryRes.data[0];
+
+        await api.patch(`/categories/${category.id}`, {
+          products: (category.products || 0) + 1
+        });
+      }
+
+      fetchInitialData();
     } catch (error) {
-      console.error('Failed to add product', error);
+      console.error("Failed to add product", error);
     }
   };
 
 
+
   const updateProduct = async (id, updatedProduct) => {
     try {
-      const res = await fetch(`http://localhost:5000/products/${id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ ...updatedProduct, id })
-      });
-
-      const data = await res.json();
-
-      setProducts(products.map(p => p.id === id ? data : p));
+      await api.put(`/products/${id}`, updatedProduct);
+      fetchInitialData();
     } catch (error) {
       console.error('Failed to update product', error);
     }
   };
 
+
+
   const deleteProduct = async (id) => {
     try {
-      await fetch(`http://localhost:5000/products/${id}`, {
-        method: 'DELETE'
-      });
-
-      setProducts(products.filter(p => p.id !== id));
+      await api.delete(`/products/${id}`);
+      fetchInitialData(); // 🔥 refetch products
     } catch (error) {
       console.error('Failed to delete product', error);
     }
   };
+
 
   const filteredProducts = products.filter(p =>
     p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -106,6 +119,7 @@ function Products() {
     if (product) {
       setEditingProduct(product);
       setFormData({
+        id: product.id,
         name: product.name,
         price: product.price.toString(),
         category: product.category,
@@ -124,6 +138,7 @@ function Products() {
     } else {
       setEditingProduct(null);
       setFormData({
+        id: '',
         name: '',
         price: '',
         category: '',
@@ -192,16 +207,16 @@ function Products() {
     }
   };
 
-  const uniqueCategories = [...new Set(products?.map(p => p.category) || [])];
 
   // 🔹 Loading state (add this just before return)
-  if (!products.length) {
+  if (loading) {
     return (
       <p style={{ padding: '2rem', textAlign: 'center' }}>
         Loading products...
       </p>
     );
   }
+
 
   return (
     <div className="admin-content">
@@ -299,6 +314,13 @@ function Products() {
           <div className="detail-view">
             <div className="detail-image-container">
               <img src={viewingProduct.image} alt={viewingProduct.name} className="detail-image" />
+              {viewingProduct.hoverImage && (
+                <img
+                  src={viewingProduct.hoverImage}
+                  alt="Hover Preview"
+                  className="detail-image hover-preview"
+                />
+              )}
             </div>
             <div className="detail-info">
               <div className="detail-row">
@@ -331,18 +353,51 @@ function Products() {
               </div>
               <div className="detail-row">
                 <div>
+                  <span className="detail-label">Product ID</span>
+                  <p className="detail-value">#{viewingProduct.id}</p>
+                </div>
+              </div>
+              {/* Full Description */}
+              <div className="detail-row">
+                <FileText size={18} />
+                <div>
+                  <span className="detail-label">Full Description</span>
+                  <p className="detail-value">
+                    {viewingProduct.fullDescription || 'No full description available'}
+                  </p>
+                </div>
+              </div>
+
+              {/* Gender */}
+              <div className="detail-row">
+                <Tag size={18} />
+                <div>
+                  <span className="detail-label">Gender</span>
+                  <p className="detail-value">
+                    {viewingProduct.gender || 'Not specified'}
+                  </p>
+                </div>
+              </div>
+
+              {/* Badge */}
+              <div className="detail-row">
+                <Tag size={18} />
+                <div>
+                  <span className="detail-label">Badge</span>
+                  <p className="detail-value">
+                    {viewingProduct.badge ? viewingProduct.badge.toUpperCase() : 'None'}
+                  </p>
+                </div>
+              </div>
+              <div className="detail-row">
+                <div>
                   <span className="detail-label">Status</span>
                   <span className={`status-badge ${viewingProduct.status === 'In Stock' ? 'in-stock' : 'out-of-stock'}`} style={{ marginLeft: '8px' }}>
                     {viewingProduct.status}
                   </span>
                 </div>
               </div>
-              <div className="detail-row">
-                <div>
-                  <span className="detail-label">Product ID</span>
-                  <p className="detail-value">#{viewingProduct.id}</p>
-                </div>
-              </div>
+
             </div>
           </div>
         )}
@@ -364,6 +419,7 @@ function Products() {
           </>
         }
       >
+
         <div className="form-group">
           <label className="form-label">
             Product Name <span className="required">*</span>
@@ -397,11 +453,16 @@ function Products() {
             <select
               className="form-select"
               value={formData.category}
-              onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, category: e.target.value })
+              }
             >
               <option value="">Select category</option>
-              {uniqueCategories.map(cat => (
-                <option key={cat} value={cat}>{cat}</option>
+
+              {categories.map(cat => (
+                <option key={cat} value={cat}>
+                  {cat}
+                </option>
               ))}
             </select>
           </div>

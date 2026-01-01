@@ -1,3 +1,4 @@
+import api from "../../../api/api";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
@@ -7,17 +8,21 @@ const CategoriesSection = () => {
 
   /* ---------------- FETCH CATEGORIES ---------------- */
   useEffect(() => {
-    fetch("http://localhost:5000/categories")
-      .then(res => res.json())
-      .then(data => {
-        setCategories(data);
+    const fetchCategories = async () => {
+      try {
+        setLoading(true);
+        const res = await api.get("/categories");
+        setCategories(res.data);
+      } catch (error) {
+        console.error("Failed to fetch categories:", error);
+      } finally {
         setLoading(false);
-      })
-      .catch(err => {
-        console.error("Failed to fetch categories:", err);
-        setLoading(false);
-      });
+      }
+    };
+
+    fetchCategories();
   }, []);
+
 
   if (loading) {
     return <p style={{ textAlign: "center" }}>Loading categories...</p>;
