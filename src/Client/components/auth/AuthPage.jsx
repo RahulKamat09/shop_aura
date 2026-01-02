@@ -1,7 +1,6 @@
+import { Link } from "react-router-dom";
 import { useState } from "react";
-import { Mail, Lock, User, Eye, EyeOff, ArrowRight, ShoppingBag, Sparkles } from "lucide-react";
-import Header from "../layout/Header";
-import Footer from "../layout/Footer";
+import { Mail, Lock, User, Eye, EyeOff, ArrowRight, ArrowLeft, ShoppingBag, Sparkles } from "lucide-react";
 import "../auth/auth.css";
 
 const AuthPage = () => {
@@ -37,6 +36,10 @@ const AuthPage = () => {
 
     return (
         <div className="auth-page">
+            <Link to="/" className="auth-back-home">
+                <ArrowLeft size={18} />
+                <span>Back to Home</span>
+            </Link>
 
             <div className="auth-container">
                 {/* Background decoration */}
@@ -149,8 +152,8 @@ const AuthPage = () => {
                                 {/* Password Field */}
                                 <div
                                     className={`auth-input-group ${focusedField === "password" || formData.password
-                                            ? "focused"
-                                            : ""
+                                        ? "focused"
+                                        : ""
                                         }`}
                                 >
                                     <div className="auth-input-icon">
@@ -184,8 +187,8 @@ const AuthPage = () => {
                                 {!isLogin && (
                                     <div
                                         className={`auth-input-group ${focusedField === "confirmPassword" || formData.confirmPassword
-                                                ? "focused"
-                                                : ""
+                                            ? "focused"
+                                            : ""
                                             }`}
                                     >
                                         <div className="auth-input-icon">

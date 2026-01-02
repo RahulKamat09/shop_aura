@@ -69,7 +69,7 @@ const Header = () => {
 
           {/* Icons */}
           <div className="header-icons">
-            <Link to="/profile" className="header-icon-btn hidden-mobile">
+            <Link to="/auth" className="header-icon-btn hidden-mobile">
               <User size={20} />
             </Link>
             <Link to="/wishlist" className="header-icon-btn">
