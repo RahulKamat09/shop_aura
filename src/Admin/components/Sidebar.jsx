@@ -1,4 +1,5 @@
 import { Store, LayoutDashboard, Package, FolderOpen, ShoppingCart, Users, MessageSquare, Settings, ChevronLeft, LogOut, X } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 function Sidebar({ currentPage, onNavigate, sidebarCollapsed, setSidebarCollapsed, mobileSidebarOpen }) {
   const navItems = [
@@ -11,6 +12,18 @@ function Sidebar({ currentPage, onNavigate, sidebarCollapsed, setSidebarCollapse
     { id: 'settings', label: 'Settings', icon: Settings }
   ];
 
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    if (!window.confirm("Are you sure you want to logout?")) return;
+    // Clear admin & user session safely
+    localStorage.removeItem("adminToken");
+    localStorage.removeItem("token");
+    localStorage.removeItem("userId");
+    // Redirect to auth page
+    navigate("/auth", { replace: true });
+  };
+
   return (
     <aside className={`admin-sidebar ${sidebarCollapsed ? 'collapsed' : ''} ${mobileSidebarOpen ? 'mobile-open' : ''}`}>
       <div className="sidebar-header">
@@ -18,7 +31,7 @@ function Sidebar({ currentPage, onNavigate, sidebarCollapsed, setSidebarCollapse
           <Store />
           <span>eStore</span>
         </div>
-        <button 
+        <button
           className="sidebar-toggle desktop-only"
           onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
         >
@@ -47,10 +60,11 @@ function Sidebar({ currentPage, onNavigate, sidebarCollapsed, setSidebarCollapse
             <p>admin@estore.com</p>
           </div>
         </div>
-        <button className="logout-btn">
+        <button className="logout-btn" onClick={handleLogout}>
           <LogOut size={20} />
           <span>Logout</span>
         </button>
+
       </div>
     </aside>
   );

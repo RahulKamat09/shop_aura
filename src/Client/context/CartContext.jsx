@@ -1,10 +1,31 @@
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
 
 const CartContext = createContext(undefined);
 
 export const CartProvider = ({ children }) => {
-  const [cartItems, setCartItems] = useState([]);
-  const [wishlistItems, setWishlistItems] = useState([]);
+
+  // ✅ LOAD FROM LOCAL STORAGE ON INIT
+  const [cartItems, setCartItems] = useState(() => {
+    const savedCart = localStorage.getItem("cartItems");
+    return savedCart ? JSON.parse(savedCart) : [];
+  });
+
+  const [wishlistItems, setWishlistItems] = useState(() => {
+    const savedWishlist = localStorage.getItem("wishlistItems");
+    return savedWishlist ? JSON.parse(savedWishlist) : [];
+  });
+
+  // ✅ SAVE TO LOCAL STORAGE WHENEVER CART CHANGES
+  useEffect(() => {
+    localStorage.setItem("cartItems", JSON.stringify(cartItems));
+  }, [cartItems]);
+
+  // ✅ SAVE WISHLIST TOO
+  useEffect(() => {
+    localStorage.setItem("wishlistItems", JSON.stringify(wishlistItems));
+  }, [wishlistItems]);
+
+  /* ---------------- CART METHODS ---------------- */
 
   const addToCart = (product) => {
     setCartItems(prev => {
@@ -38,6 +59,7 @@ export const CartProvider = ({ children }) => {
 
   const clearCart = () => {
     setCartItems([]);
+    localStorage.removeItem("cartItems"); // ✅ clear storage
   };
 
   const getCartTotal = () => {
@@ -47,6 +69,8 @@ export const CartProvider = ({ children }) => {
   const getCartCount = () => {
     return cartItems.reduce((count, item) => count + item.quantity, 0);
   };
+
+  /* ---------------- WISHLIST METHODS ---------------- */
 
   const addToWishlist = (product) => {
     setWishlistItems(prev => {

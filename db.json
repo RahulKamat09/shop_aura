@@ -1005,7 +1005,7 @@
         "email": "bob@example.com"
       },
       "date": "2024-12-10",
-      "status": "Pending",
+      "status": "Completed",
       "total": 324.99
     },
     {
@@ -1031,56 +1031,34 @@
   ],
   "customers": [
     {
-      "id": "1",
+      "id": "u_101",
       "name": "John Doe",
       "email": "john@example.com",
-      "phone": "+1 234 567 890",
-      "registered": "2024-01-15",
-      "orders": 12,
-      "totalSpent": 1450,
+      "phone": "",
+      "password": "123456",
+      "registered": "2026-01-02",
+      "orders": 0,
+      "totalSpent": 0,
       "status": "Active"
     },
     {
-      "id": "2",
-      "name": "Jane Smith",
-      "email": "jane@example.com",
-      "phone": "+1 234 567 891",
-      "registered": "2024-02-20",
-      "orders": 8,
-      "totalSpent": 890.5,
-      "status": "Active"
-    },
-    {
-      "id": "3",
-      "name": "Bob Wilson",
-      "email": "bob@example.com",
-      "phone": "+1 234 567 892",
-      "registered": "2024-03-10",
-      "orders": 5,
-      "totalSpent": 567,
-      "status": "Active"
-    },
-    {
-      "id": "4",
-      "name": "Alice Brown",
-      "email": "alice@example.com",
-      "phone": "+1 234 567 893",
-      "registered": "2024-04-05",
-      "orders": 3,
-      "totalSpent": 234.5,
-      "status": "Inactive"
-    },
-    {
-      "id": "5",
-      "name": "Charlie Davis",
-      "email": "charlie@example.com",
-      "phone": "+1 234 567 894",
-      "registered": "2024-05-01",
-      "orders": 15,
-      "totalSpent": 2100,
+      "id": "u_1767419350577",
+      "name": "Rahul Kamat",
+      "email": "kamatrahul415@gmail.com",
+      "phone": "7203806609",
+      "password": "Rahul1234",
+      "registered": "2026-01-03",
+      "orders": 0,
+      "totalSpent": 0,
       "status": "Active"
     }
   ],
+  "admin": {
+    "name": "Admin User",
+    "email": "admin@shopaura.com",
+    "phone": "7203806609",
+    "password": "admin2323"
+  },
   "messages": [
     {
       "id": "1",

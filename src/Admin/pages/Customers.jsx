@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Search, Eye, Users, UserCheck, DollarSign, Mail, Phone, Calendar, ShoppingBag, MapPin } from 'lucide-react';
+import { Search, Eye, Users, UserCheck, DollarSign, Mail, Phone, Calendar, ShoppingBag, MapPin, Trash2 } from 'lucide-react';
 import AModal from '../components/AModal';
 import Pagination from '../components/Pagination';
 
@@ -60,6 +60,30 @@ function Customers() {
   const getCustomerOrders = (customerName) => {
     return orders.filter(o => o.customer.name === customerName);
   };
+
+  const updateStatus = async (id, status) => {
+    await fetch(`http://localhost:5000/customers/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status }),
+    });
+
+    setCustomers(prev =>
+      prev.map(c => (c.id === id ? { ...c, status } : c))
+    );
+  };
+
+  const deleteCustomer = async (id) => {
+    const confirmDelete = window.confirm("Are you sure you want to delete this customer?");
+    if (!confirmDelete) return;
+
+    await fetch(`http://localhost:5000/customers/${id}`, {
+      method: "DELETE",
+    });
+
+    setCustomers(prev => prev.filter(c => c.id !== id));
+  };
+
 
   return (
     <div className="admin-content">
@@ -149,11 +173,39 @@ function Customers() {
                     {customer.status}
                   </span>
                 </td>
-                <td>
+                <td style={{ display: "flex", gap: "8px" }}>
                   <button className="btn-icon" onClick={() => handleViewCustomer(customer)}>
                     <Eye size={18} />
                   </button>
+
+                  {customer.status === "Active" ? (
+                    <button
+                      className="btn-icon"
+                      title="Deactivate"
+                      onClick={() => updateStatus(customer.id, "Inactive")}
+                    >
+                      <UserCheck size={18} />
+                    </button>
+                  ) : (
+                    <button
+                      className="btn-icon"
+                      title="Activate"
+                      onClick={() => updateStatus(customer.id, "Active")}
+                    >
+                      <Users size={18} />
+                    </button>
+                  )}
+
+                  <button
+                    className="btn-icon"
+                    title="Delete"
+                    style={{ color: "var(--admin-danger)" }}
+                    onClick={() => deleteCustomer(customer.id)}
+                  >
+                    <Trash2 size={18} />
+                  </button>
                 </td>
+
               </tr>
             ))}
           </tbody>

@@ -12,6 +12,9 @@ import Profile from "./Client/pages/Profile";
 import NotFound from "./Client/pages/NotFound";
 import AdminApp from "./Admin/AdminApp";
 import AuthPage from "./Client/components/auth/AuthPage";
+import ProtectedRoute from "./routes/ProtectedRoute";
+import PublicAuthRoute from "./routes/PublicAuthRoute";
+import AdminProtectedRoute from "./routes/AdminProtectedRoute";
 
 const App = () => (
   <CartProvider>
@@ -22,12 +25,12 @@ const App = () => (
         <Route path="/category" element={<Category />} />
         <Route path="/product/:id" element={<ProductDetails />} />
         <Route path="/cart" element={<Cart />} />
-        <Route path="/checkout" element={<Checkout />} />
+        <Route path="/checkout" element={<ProtectedRoute><Checkout /></ProtectedRoute>} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/wishlist" element={<Wishlist />} />
-        <Route path="/profile" element={<Profile />} />
-        <Route path="/admin/*" element={<AdminApp />} />
-        <Route path="/auth" element={<AuthPage />} />
+        <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+        <Route path="/admin/*" element={<AdminProtectedRoute><AdminApp /></AdminProtectedRoute>} />
+        <Route path="/auth" element={<PublicAuthRoute><AuthPage /></PublicAuthRoute>} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>

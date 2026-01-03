@@ -8,15 +8,15 @@ const Header = () => {
   const { getCartCount, wishlistItems } = useCart();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const isLoggedIn = !!localStorage.getItem("token");
 
   const navLinks = [
     { path: '/', label: 'Home' },
     { path: '/about', label: 'About' },
     { path: '/category', label: 'Category' },
     { path: '/product/1', label: 'Product Details' },
-    { path: '/cart', label: 'Cart' },
-    { path: '/checkout', label: 'Checkout' },
     { path: '/contact', label: 'Contact' },
+    !isLoggedIn && { path: '/auth', label: 'Login' }
   ];
 
   const isActive = (path) => location.pathname === path;
@@ -69,9 +69,13 @@ const Header = () => {
 
           {/* Icons */}
           <div className="header-icons">
-            <Link to="/auth" className="header-icon-btn hidden-mobile">
-              <User size={20} />
-            </Link>
+            {/* USER ICON ONLY WHEN LOGGED IN */}
+            {isLoggedIn && (
+              <Link to="/profile" className="header-icon-btn hidden-mobile">
+                <User size={20} />
+              </Link>
+            )}
+
             <Link to="/wishlist" className="header-icon-btn">
               <Heart size={20} />
               {wishlistItems.length > 0 && (

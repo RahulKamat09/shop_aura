@@ -1,3 +1,4 @@
+import api from "../../api/api";
 import { useEffect, useState } from 'react';
 import { Search, Eye, Package, Calendar, User, Mail, MapPin, CreditCard } from 'lucide-react';
 import AModal from '../components/AModal';
@@ -15,14 +16,54 @@ function Orders() {
   const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
-    fetch('http://localhost:5000/orders')
-      .then(res => res.json())
-      .then(data => setOrders(data));
+    const loadData = async () => {
+      try {
+        const [ordersRes, productsRes] = await Promise.all([
+          api.get("/orders"),
+          api.get("/products"),
+        ]);
 
-    fetch('http://localhost:5000/products')
-      .then(res => res.json())
-      .then(data => setProducts(data));
+        setOrders(ordersRes.data);
+        setProducts(productsRes.data);
+      } catch (error) {
+        console.error("Failed to load data", error);
+      }
+    };
+
+    loadData();
   }, []);
+
+  // Admin Order Actions (ADD ONLY)
+  const handleAdminAction = async (orderId, action) => {
+    let newStatus = "";
+
+    switch (action) {
+      case "confirm":
+        newStatus = "Processing";
+        break;
+      case "complete":
+        newStatus = "Completed";
+        break;
+      case "cancel":
+        newStatus = "Cancelled";
+        break;
+      default:
+        return;
+    }
+
+    try {
+      await api.patch(`/orders/${orderId}`, { status: newStatus });
+
+      setOrders(prev =>
+        prev.map(order =>
+          order.id === orderId ? { ...order, status: newStatus } : order
+        )
+      );
+    } catch (error) {
+      console.error("Order update failed", error);
+    }
+  };
+
 
   // CRUD Operations
   const updateOrderStatus = (id, status) => {

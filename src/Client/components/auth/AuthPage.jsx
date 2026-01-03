@@ -1,17 +1,20 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { Mail, Lock, User, Eye, EyeOff, ArrowRight, ArrowLeft, ShoppingBag, Sparkles } from "lucide-react";
+import { Mail, Lock, User, Eye, EyeOff, ArrowRight, ArrowLeft, ShoppingBag, Sparkles, Phone } from "lucide-react";
 import "../auth/auth.css";
 
 const AuthPage = () => {
     const [isLogin, setIsLogin] = useState(true);
     const [showPassword, setShowPassword] = useState(false);
+    const navigate = useNavigate();
+    const location = useLocation();
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [formData, setFormData] = useState({
         name: "",
         email: "",
+        phone: "",
         password: "",
-        confirmPassword: "",
+        confirmPassword: ""
     });
     const [focusedField, setFocusedField] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
@@ -20,14 +23,124 @@ const AuthPage = () => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
+    const from = location.state?.from?.pathname || "/";
+
+    const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setIsLoading(true);
-        // Simulate API call
-        await new Promise((resolve) => setTimeout(resolve, 1500));
+
+        if (!isLogin) {
+            // 🔍 Check for duplicate email or phone
+            const res = await fetch("http://localhost:5000/customers");
+            const customers = await res.json();
+
+            const emailExists = customers.some(
+                (c) => c.email === formData.email
+            );
+
+            const phoneExists =
+                formData.phone &&
+                customers.some((c) => c.phone === formData.phone);
+
+            if (emailExists) {
+                alert("This email is already registered");
+                setIsLoading(false);
+                return;
+            }
+
+            if (phoneExists) {
+                alert("This phone number is already registered");
+                setIsLoading(false);
+                return;
+            }
+
+            // ✅ Create new customer
+            const newCustomer = {
+                id: "u_" + Date.now(),
+                name: formData.name,
+                email: formData.email,
+                phone: formData.phone || "",
+                password: formData.password, // plain for now
+                registered: new Date().toISOString().split("T")[0],
+                orders: 0,
+                totalSpent: 0,
+                status: "Active",
+            };
+
+            await fetch("http://localhost:5000/customers", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(newCustomer),
+            });
+
+            localStorage.setItem("token", "user_logged_in");
+            localStorage.setItem("userId", newCustomer.id);
+        } else {
+            // =========================
+            // 🔐 ADMIN LOGIN (FIRST)
+            // =========================
+            const adminRes = await fetch("http://localhost:5000/admin");
+            const admin = await adminRes.json();
+
+            if (
+                formData.email === admin.email &&
+                formData.password === admin.password
+            ) {
+                localStorage.setItem("adminToken", "admin_logged_in");
+
+                await delay(2000 + Math.random() * 1000);
+                // ⏳ admin delay
+
+                setIsLoading(false);
+                navigate("/admin", { replace: true });
+                return;
+            }
+
+
+            // =========================
+            // 🔐 USER LOGIN
+            // =========================
+            // =========================
+            // 🔐 USER LOGIN
+            // =========================
+            const res = await fetch(
+                `http://localhost:5000/customers?email=${formData.email}&password=${formData.password}`
+            );
+            const user = await res.json();
+
+            // ❌ Invalid credentials
+            if (!user.length) {
+                alert("Invalid email or password");
+                setIsLoading(false);
+                return;
+            }
+
+            // ❌ Inactive account check (IMPORTANT)
+            if (user[0].status !== "Active") {
+                alert("Your account is inactive. You can’t log in. Please contact support.");
+                setIsLoading(false);
+                return;
+            }
+
+            // ✅ Active user → allow login
+            localStorage.setItem("token", "user_logged_in");
+            localStorage.setItem("userId", user[0].id);
+        }
+
+        // ⏳ Artificial delay for better UX
+        await delay(2000 + Math.random() * 1000);
+        // 2000 = 2 seconds (use 3000 if you want)
+
+        // Stop loader
         setIsLoading(false);
-        console.log("Form submitted:", formData);
+
+        // Redirect
+        navigate(from, { replace: true });
+
     };
+
 
     const toggleMode = () => {
         setIsLogin(!isLogin);
@@ -120,7 +233,30 @@ const AuthPage = () => {
                                         <label htmlFor="name" className="auth-input-label">
                                             Full Name
                                         </label>
-                                        <div className="auth-input-highlight"></div>
+                                    </div>
+                                )}
+
+                                {!isLogin && (
+                                    <div
+                                        className={`auth-input-group ${focusedField === "phone" || formData.name ? "focused" : ""
+                                            }`}
+                                    >
+                                        <div className="auth-input-icon">
+                                            <Phone size={20} />
+                                        </div>
+                                        <input
+                                            type="tel"
+                                            name="phone"
+                                            id="phone"
+                                            value={formData.phone}
+                                            onChange={handleInputChange}
+                                            onFocus={() => setFocusedField("phone")}
+                                            onBlur={() => setFocusedField(null)}
+                                            className="auth-input"
+                                        />
+                                        <label htmlFor="name" className="auth-input-label">
+                                            Phone
+                                        </label>
                                     </div>
                                 )}
 
@@ -146,7 +282,6 @@ const AuthPage = () => {
                                     <label htmlFor="email" className="auth-input-label">
                                         Email Address
                                     </label>
-                                    <div className="auth-input-highlight"></div>
                                 </div>
 
                                 {/* Password Field */}
@@ -180,7 +315,6 @@ const AuthPage = () => {
                                     >
                                         {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                                     </button>
-                                    <div className="auth-input-highlight"></div>
                                 </div>
 
                                 {/* Confirm Password - Register Only */}
@@ -219,7 +353,6 @@ const AuthPage = () => {
                                                 <Eye size={20} />
                                             )}
                                         </button>
-                                        <div className="auth-input-highlight"></div>
                                     </div>
                                 )}
 

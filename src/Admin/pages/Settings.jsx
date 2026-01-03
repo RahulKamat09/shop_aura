@@ -1,12 +1,41 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { User, Store, Bell, Shield, CreditCard, HelpCircle } from 'lucide-react';
 
 function Settings() {
   const [activeSection, setActiveSection] = useState('profile');
+  const [admin, setAdmin] = useState({
+    name: "",
+    email: "",
+    phone: ""
+  });
+
+  useEffect(() => {
+    fetch("http://localhost:5000/admin")
+      .then(res => res.json())
+      .then(data => {
+        setAdmin({
+          name: data.name,
+          email: data.email,
+          phone: data.phone
+        });
+      });
+  }, []);
+
+  const handleAdminSave = async () => {
+    await fetch("http://localhost:5000/admin", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        ...admin
+        // password untouched
+      })
+    });
+
+    alert("Admin profile updated successfully");
+  };
+
   const [settings, setSettings] = useState({
-    storeName: 'eStore',
-    storeEmail: 'admin@estore.com',
-    storePhone: '+1 234 567 890',
+    storeName: 'ShopAura',
     storeAddress: '123 Store Street, City, Country',
     currency: 'USD',
     emailNotifications: true,
@@ -15,6 +44,7 @@ function Settings() {
     twoFactorAuth: false,
     sessionTimeout: '30'
   });
+
 
   const navItems = [
     { id: 'profile', label: 'Profile', icon: User },
@@ -33,24 +63,49 @@ function Settings() {
     switch (activeSection) {
       case 'profile':
         return (
-          <>
-            <div className="settings-section">
-              <h3>Admin Profile</h3>
-              <div className="form-group">
-                <label className="form-label">Full Name</label>
-                <input type="text" className="form-input" defaultValue="Admin User" />
-              </div>
-              <div className="form-group">
-                <label className="form-label">Email Address</label>
-                <input type="email" className="form-input" defaultValue="admin@estore.com" />
-              </div>
-              <div className="form-group">
-                <label className="form-label">Phone Number</label>
-                <input type="tel" className="form-input" defaultValue="+1 234 567 890" />
-              </div>
-              <button className="btn btn-primary">Save Changes</button>
+          <div className="settings-section">
+            <h3>Admin Profile</h3>
+
+            <div className="form-group">
+              <label className="form-label">Full Name</label>
+              <input
+                type="text"
+                className="form-input"
+                value={admin.name}
+                onChange={(e) =>
+                  setAdmin({ ...admin, name: e.target.value })
+                }
+              />
             </div>
-          </>
+
+            <div className="form-group">
+              <label className="form-label">Email Address</label>
+              <input
+                type="email"
+                className="form-input"
+                value={admin.email}
+                onChange={(e) =>
+                  setAdmin({ ...admin, email: e.target.value })
+                }
+              />
+            </div>
+
+            <div className="form-group">
+              <label className="form-label">Phone Number</label>
+              <input
+                type="tel"
+                className="form-input"
+                value={admin.phone}
+                onChange={(e) =>
+                  setAdmin({ ...admin, phone: e.target.value })
+                }
+              />
+            </div>
+
+            <button className="btn btn-primary" onClick={handleAdminSave}>
+              Save Changes
+            </button>
+          </div>
         );
 
       case 'store':
@@ -60,42 +115,24 @@ function Settings() {
               <h3>Store Information</h3>
               <div className="form-group">
                 <label className="form-label">Store Name</label>
-                <input 
-                  type="text" 
-                  className="form-input" 
+                <input
+                  type="text"
+                  className="form-input"
                   value={settings.storeName}
                   onChange={(e) => setSettings({ ...settings, storeName: e.target.value })}
                 />
               </div>
               <div className="form-group">
-                <label className="form-label">Store Email</label>
-                <input 
-                  type="email" 
-                  className="form-input" 
-                  value={settings.storeEmail}
-                  onChange={(e) => setSettings({ ...settings, storeEmail: e.target.value })}
-                />
-              </div>
-              <div className="form-group">
-                <label className="form-label">Store Phone</label>
-                <input 
-                  type="tel" 
-                  className="form-input" 
-                  value={settings.storePhone}
-                  onChange={(e) => setSettings({ ...settings, storePhone: e.target.value })}
-                />
-              </div>
-              <div className="form-group">
                 <label className="form-label">Store Address</label>
-                <textarea 
-                  className="form-textarea" 
+                <textarea
+                  className="form-textarea"
                   value={settings.storeAddress}
                   onChange={(e) => setSettings({ ...settings, storeAddress: e.target.value })}
                 />
               </div>
               <div className="form-group">
                 <label className="form-label">Currency</label>
-                <select 
+                <select
                   className="form-select"
                   value={settings.currency}
                   onChange={(e) => setSettings({ ...settings, currency: e.target.value })}
@@ -122,8 +159,8 @@ function Settings() {
                   <p>Receive email updates about your store activity</p>
                 </div>
                 <label className="toggle-switch">
-                  <input 
-                    type="checkbox" 
+                  <input
+                    type="checkbox"
                     checked={settings.emailNotifications}
                     onChange={() => handleToggle('emailNotifications')}
                   />
@@ -136,8 +173,8 @@ function Settings() {
                   <p>Get notified when you receive new orders</p>
                 </div>
                 <label className="toggle-switch">
-                  <input 
-                    type="checkbox" 
+                  <input
+                    type="checkbox"
                     checked={settings.orderNotifications}
                     onChange={() => handleToggle('orderNotifications')}
                   />
@@ -150,8 +187,8 @@ function Settings() {
                   <p>Receive tips and promotions from eStore</p>
                 </div>
                 <label className="toggle-switch">
-                  <input 
-                    type="checkbox" 
+                  <input
+                    type="checkbox"
                     checked={settings.marketingEmails}
                     onChange={() => handleToggle('marketingEmails')}
                   />
@@ -173,8 +210,8 @@ function Settings() {
                   <p>Add an extra layer of security to your account</p>
                 </div>
                 <label className="toggle-switch">
-                  <input 
-                    type="checkbox" 
+                  <input
+                    type="checkbox"
                     checked={settings.twoFactorAuth}
                     onChange={() => handleToggle('twoFactorAuth')}
                   />
@@ -183,7 +220,7 @@ function Settings() {
               </div>
               <div className="form-group" style={{ marginTop: '20px' }}>
                 <label className="form-label">Session Timeout (minutes)</label>
-                <select 
+                <select
                   className="form-select"
                   value={settings.sessionTimeout}
                   onChange={(e) => setSettings({ ...settings, sessionTimeout: e.target.value })}
@@ -194,22 +231,6 @@ function Settings() {
                   <option value="120">2 hours</option>
                 </select>
               </div>
-            </div>
-            <div className="settings-section">
-              <h3>Change Password</h3>
-              <div className="form-group">
-                <label className="form-label">Current Password</label>
-                <input type="password" className="form-input" placeholder="Enter current password" />
-              </div>
-              <div className="form-group">
-                <label className="form-label">New Password</label>
-                <input type="password" className="form-input" placeholder="Enter new password" />
-              </div>
-              <div className="form-group">
-                <label className="form-label">Confirm New Password</label>
-                <input type="password" className="form-input" placeholder="Confirm new password" />
-              </div>
-              <button className="btn btn-primary">Update Password</button>
             </div>
           </>
         );

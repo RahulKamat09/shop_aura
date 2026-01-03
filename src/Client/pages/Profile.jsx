@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Layout from '../components/layout/Layout';
 import { useCart } from '../context/CartContext';
 import { User, Package, Heart, MapPin, CreditCard, Settings, LogOut, Camera } from 'lucide-react';
@@ -7,13 +7,28 @@ import { Link } from 'react-router-dom';
 const Profile = () => {
   const { wishlistItems } = useCart();
   const [activeTab, setActiveTab] = useState('profile');
-  const [profile, setProfile] = useState({
-    firstName: 'John',
-    lastName: 'Doe',
-    email: 'john.doe@example.com',
-    phone: '+1 (234) 567-890',
-    avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop'
-  });
+  const [profile, setProfile] = useState(null);
+  useEffect(() => {
+    const userId = localStorage.getItem("userId");
+
+    fetch(`http://localhost:5000/customers/${userId}`)
+      .then(res => res.json())
+      .then(data => {
+        const [firstName, lastName = ""] = data.name.split(" ");
+        setProfile({
+          firstName,
+          lastName,
+          email: data.email,
+          phone: data.phone,
+          avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150"
+        });
+      });
+  }, []);
+
+  if (!profile) {
+    return <p style={{ padding: "2rem" }}>Loading profile...</p>;
+  }
+
 
   const addresses = [
     {
@@ -93,19 +108,19 @@ const Profile = () => {
             <div style={{ backgroundColor: 'var(--card)', padding: '1.5rem', borderRadius: 'var(--radius)', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem', paddingBottom: '1.5rem', borderBottom: '1px solid var(--border)' }}>
                 <div style={{ position: 'relative' }}>
-                  <img 
-                    src={profile.avatar} 
+                  <img
+                    src={profile.avatar}
                     alt={profile.firstName}
                     style={{ width: '64px', height: '64px', borderRadius: '50%', objectFit: 'cover' }}
                   />
-                  <button style={{ 
-                    position: 'absolute', 
-                    bottom: 0, 
-                    right: 0, 
-                    width: '24px', 
-                    height: '24px', 
-                    borderRadius: '50%', 
-                    backgroundColor: 'var(--primary)', 
+                  <button style={{
+                    position: 'absolute',
+                    bottom: 0,
+                    right: 0,
+                    width: '24px',
+                    height: '24px',
+                    borderRadius: '50%',
+                    backgroundColor: 'var(--primary)',
                     color: 'white',
                     display: 'flex',
                     alignItems: 'center',
@@ -131,10 +146,21 @@ const Profile = () => {
                     {tab.label}
                   </button>
                 ))}
-                <button className="profile-tab" style={{ color: 'var(--destructive)' }}>
+                <button
+                  className="profile-tab"
+                  style={{ color: 'var(--destructive)' }}
+                  onClick={() => {
+                    if (!window.confirm("Are you sure you want to logout?")) return;
+                    localStorage.removeItem("token");
+                    localStorage.removeItem("userId");
+                    window.location.href = "/";
+
+                  }}
+                >
                   <LogOut size={18} />
                   Logout
                 </button>
+
               </div>
             </div>
 
@@ -147,38 +173,38 @@ const Profile = () => {
                     <div className="form-grid form-grid-2">
                       <div className="form-group">
                         <label className="form-label">First Name</label>
-                        <input 
-                          type="text" 
-                          className="input-field" 
+                        <input
+                          type="text"
+                          className="input-field"
                           value={profile.firstName}
-                          onChange={(e) => setProfile({...profile, firstName: e.target.value})}
+                          onChange={(e) => setProfile({ ...profile, firstName: e.target.value })}
                         />
                       </div>
                       <div className="form-group">
                         <label className="form-label">Last Name</label>
-                        <input 
-                          type="text" 
-                          className="input-field" 
+                        <input
+                          type="text"
+                          className="input-field"
                           value={profile.lastName}
-                          onChange={(e) => setProfile({...profile, lastName: e.target.value})}
+                          onChange={(e) => setProfile({ ...profile, lastName: e.target.value })}
                         />
                       </div>
                       <div className="form-group">
                         <label className="form-label">Email</label>
-                        <input 
-                          type="email" 
-                          className="input-field" 
+                        <input
+                          type="email"
+                          className="input-field"
                           value={profile.email}
-                          onChange={(e) => setProfile({...profile, email: e.target.value})}
+                          onChange={(e) => setProfile({ ...profile, email: e.target.value })}
                         />
                       </div>
                       <div className="form-group">
                         <label className="form-label">Phone</label>
-                        <input 
-                          type="tel" 
-                          className="input-field" 
+                        <input
+                          type="tel"
+                          className="input-field"
                           value={profile.phone}
-                          onChange={(e) => setProfile({...profile, phone: e.target.value})}
+                          onChange={(e) => setProfile({ ...profile, phone: e.target.value })}
                         />
                       </div>
                     </div>
@@ -197,10 +223,10 @@ const Profile = () => {
                       <div key={order.id} style={{ padding: '1rem', backgroundColor: 'var(--secondary)', borderRadius: 'var(--radius)' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
                           <span style={{ fontWeight: '600' }}>{order.id}</span>
-                          <span style={{ 
-                            padding: '0.25rem 0.75rem', 
-                            borderRadius: '9999px', 
-                            fontSize: '0.75rem', 
+                          <span style={{
+                            padding: '0.25rem 0.75rem',
+                            borderRadius: '9999px',
+                            fontSize: '0.75rem',
                             fontWeight: '500',
                             backgroundColor: order.status === 'Delivered' ? 'var(--success)' : order.status === 'In Transit' ? 'var(--warning)' : 'var(--primary)',
                             color: 'white'
