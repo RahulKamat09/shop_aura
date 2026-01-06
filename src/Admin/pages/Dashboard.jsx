@@ -15,35 +15,49 @@ function Dashboard({ onNavigate }) {
   const [messages, setMessages] = useState([]);
   const [customers, setCustomers] = useState([]);
 
-  /* ---------------- FETCH DATA FROM db.json ---------------- */
+  /* ---------------- FETCH DATA ---------------- */
   useEffect(() => {
-    fetch('http://localhost:5000/products')
-      .then(res => res.json())
-      .then(data => setProducts(data));
+    const fetchData = async () => {
+      try {
+        const [productsRes, ordersRes, messagesRes, customersRes] =
+          await Promise.all([
+            fetch('http://localhost:5000/products'),
+            fetch('http://localhost:5000/orders'),
+            fetch('http://localhost:5000/messages'),
+            fetch('http://localhost:5000/customers'),
+          ]);
 
-    fetch('http://localhost:5000/orders')
-      .then(res => res.json())
-      .then(data => setOrders(data));
+        setProducts(await productsRes.json());
+        setOrders(await ordersRes.json());
+        setMessages(await messagesRes.json());
+        setCustomers(await customersRes.json());
+      } catch (error) {
+        console.error('Dashboard fetch error:', error);
+      }
+    };
 
-    fetch('http://localhost:5000/messages')
-      .then(res => res.json())
-      .then(data => setMessages(data));
-
-    fetch('http://localhost:5000/customers')
-      .then(res => res.json())
-      .then(data => setCustomers(data));
+    fetchData();
   }, []);
 
-  /* ---------------- CALCULATIONS (UNCHANGED) ---------------- */
-  const totalRevenue = orders.reduce((sum, o) => sum + o.total, 0);
-  const pendingOrders = orders.filter(o => o.status === 'Pending').length;
-  const unreadMessages = messages.filter(m => m.status === 'unread').length;
+  /* ---------------- CALCULATIONS ---------------- */
+  const totalRevenue = orders.reduce(
+    (sum, o) => sum + Number(o?.total || 0),
+    0
+  );
+
+  const pendingOrders = orders.filter(
+    o => o?.status === 'Pending'
+  ).length;
+
+  const unreadMessages = messages.filter(
+    m => m?.status === 'unread'
+  ).length;
 
   const recentOrders = orders.slice(0, 5);
   const recentMessages = messages.slice(0, 3);
   const topProducts = products.slice(0, 3);
 
-  const getStatusClass = (status) => {
+  const getStatusClass = (status = '') => {
     switch (status.toLowerCase()) {
       case 'completed': return 'completed';
       case 'processing': return 'processing';
@@ -91,9 +105,7 @@ function Dashboard({ onNavigate }) {
           <div className="stat-content">
             <span className="stat-labels">Total Orders</span>
             <h2 className="stat-values">{orders.length}</h2>
-            <p style={{ fontSize: '12px' }}>
-              {pendingOrders} pending
-            </p>
+            <p style={{ fontSize: '12px' }}>{pendingOrders} pending</p>
           </div>
           <div className="stat-icons orange">
             <ShoppingCart size={22} />
@@ -132,18 +144,26 @@ function Dashboard({ onNavigate }) {
                 </tr>
               </thead>
               <tbody>
-                {recentOrders.map(order => (
-                  <tr key={order.id}>
-                    <td>{order.id}</td>
-                    <td>{order.customer.name}</td>
-                    <td>
-                      <span className={`status-badge ${getStatusClass(order.status)}`}>
-                        {order.status}
-                      </span>
+                {recentOrders.length === 0 ? (
+                  <tr>
+                    <td colSpan="4" style={{ textAlign: 'center' }}>
+                      No recent orders
                     </td>
-                    <td>${order.total.toFixed(2)}</td>
                   </tr>
-                ))}
+                ) : (
+                  recentOrders.map(order => (
+                    <tr key={order.id}>
+                      <td>{order.id}</td>
+                      <td>{order.customer?.name || 'Guest'}</td>
+                      <td>
+                        <span className={`status-badge ${getStatusClass(order.status)}`}>
+                          {order.status || 'Unknown'}
+                        </span>
+                      </td>
+                      <td>${Number(order.total || 0).toFixed(2)}</td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>
@@ -159,15 +179,19 @@ function Dashboard({ onNavigate }) {
               )}
             </div>
 
-            {recentMessages.map(msg => (
-              <div key={msg.id} className="mini-message">
-                <MessageSquare size={18} />
-                <div>
-                  <h4>{msg.subject}</h4>
-                  <p>{msg.sender}</p>
+            {recentMessages.length === 0 ? (
+              <p style={{ padding: '1rem' }}>No messages</p>
+            ) : (
+              recentMessages.map(msg => (
+                <div key={msg.id} className="mini-message">
+                  <MessageSquare size={18} />
+                  <div>
+                    <h4>{msg.subject}</h4>
+                    <p>{msg.sender}</p>
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))
+            )}
 
             <a className="view-all-link" onClick={() => onNavigate('messages')}>
               View all messages
@@ -184,7 +208,7 @@ function Dashboard({ onNavigate }) {
                 <img src={product.image} alt={product.name} />
                 <div>
                   <h4>{product.name}</h4>
-                  <p>${product.price.toFixed(2)}</p>
+                  <p>${Number(product.price || 0).toFixed(2)}</p>
                 </div>
               </div>
             ))}

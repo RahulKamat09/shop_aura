@@ -1,35 +1,55 @@
 import { useState, useEffect } from 'react';
 import Layout from '../components/layout/Layout';
 import { useCart } from '../context/CartContext';
-import { User, Package, Heart, MapPin, CreditCard, Settings, LogOut, Camera } from 'lucide-react';
+import { User, Package, Heart, MapPin, Settings, LogOut, Camera } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const Profile = () => {
+  const [orders, setOrders] = useState([]);
   const { wishlistItems } = useCart();
   const [activeTab, setActiveTab] = useState('profile');
   const [profile, setProfile] = useState(null);
+
+  const userId = localStorage.getItem("userId");
+
+  /* ---------------- FETCH ORDERS ---------------- */
   useEffect(() => {
-    const userId = localStorage.getItem("userId");
+    if (!userId) return;
+
+    fetch(`http://localhost:5000/orders?userId=${userId}`)
+      .then(res => res.json())
+      .then(data => setOrders(data || []))
+      .catch(err => console.error("Order fetch error:", err));
+  }, [userId]);
+
+  /* ---------------- FETCH PROFILE ---------------- */
+  useEffect(() => {
+    if (!userId) return;
 
     fetch(`http://localhost:5000/customers/${userId}`)
       .then(res => res.json())
       .then(data => {
-        const [firstName, lastName = ""] = data.name.split(" ");
+        const name = data?.name || "";
+        const [firstName, lastName = ""] = name.split(" ");
+
         setProfile({
           firstName,
           lastName,
-          email: data.email,
-          phone: data.phone,
-          avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150"
+          email: data?.email || "",
+          phone: data?.phone || "",
+          avatar:
+            data?.avatar ||
+            "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150"
         });
-      });
-  }, []);
+      })
+      .catch(err => console.error("Profile fetch error:", err));
+  }, [userId]);
 
   if (!profile) {
     return <p style={{ padding: "2rem" }}>Loading profile...</p>;
   }
 
-
+  /* ---------------- STATIC DATA ---------------- */
   const addresses = [
     {
       id: 1,
@@ -48,30 +68,6 @@ const Profile = () => {
       state: 'NY',
       zip: '10002',
       isDefault: false
-    }
-  ];
-
-  const orders = [
-    {
-      id: 'ORD-001',
-      date: '2025-01-15',
-      status: 'Delivered',
-      total: 259.99,
-      items: 3
-    },
-    {
-      id: 'ORD-002',
-      date: '2025-01-10',
-      status: 'In Transit',
-      total: 149.50,
-      items: 2
-    },
-    {
-      id: 'ORD-003',
-      date: '2025-01-05',
-      status: 'Processing',
-      total: 89.99,
-      items: 1
     }
   ];
 
@@ -220,26 +216,39 @@ const Profile = () => {
                   <h2 style={{ fontSize: '1.25rem', fontWeight: '600', marginBottom: '1.5rem' }}>Order History</h2>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                     {orders.map(order => (
-                      <div key={order.id} style={{ padding: '1rem', backgroundColor: 'var(--secondary)', borderRadius: 'var(--radius)' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-                          <span style={{ fontWeight: '600' }}>{order.id}</span>
-                          <span style={{
-                            padding: '0.25rem 0.75rem',
-                            borderRadius: '9999px',
-                            fontSize: '0.75rem',
-                            fontWeight: '500',
-                            backgroundColor: order.status === 'Delivered' ? 'var(--success)' : order.status === 'In Transit' ? 'var(--warning)' : 'var(--primary)',
-                            color: 'white'
-                          }}>
-                            {order.status}
-                          </span>
+                      <Link
+                        key={order.id}
+                        to={`/order/${order.id}`}
+                        style={{ textDecoration: 'none', color: 'inherit' }}
+                      >
+                        <div style={{ padding: '1rem', backgroundColor: 'var(--secondary)', borderRadius: 'var(--radius)' }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                            <span style={{ fontWeight: '600' }}>{order.id}</span>
+                            <span style={{
+                              padding: '0.25rem 0.75rem',
+                              borderRadius: '9999px',
+                              fontSize: '0.75rem',
+                              fontWeight: '500',
+                              backgroundColor:
+                                order.status === 'Completed'
+                                  ? 'var(--success)'
+                                  : order.status === 'Processing'
+                                    ? 'var(--warning)'
+                                    : order.status === 'Cancelled'
+                                      ? 'var(--destructive)'
+                                      : 'var(--primary)',
+                              color: 'white'
+                            }}>
+                              {order.status}
+                            </span>
+                          </div>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--muted-foreground)', fontSize: '0.875rem' }}>
+                            <span>{order.date || "—"}</span>
+                            <span>{Array.isArray(order.items) ? order.items.length : 0} items</span>
+                            <strong>${Number(order.total || 0).toFixed(2)}</strong>
+                          </div>
                         </div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--muted-foreground)', fontSize: '0.875rem' }}>
-                          <span>{order.date}</span>
-                          <span>{order.items} items</span>
-                          <span style={{ fontWeight: '600', color: 'var(--foreground)' }}>${order.total.toFixed(2)}</span>
-                        </div>
-                      </div>
+                      </Link>
                     ))}
                   </div>
                 </div>

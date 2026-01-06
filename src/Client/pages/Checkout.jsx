@@ -7,12 +7,91 @@ import { CreditCard, Truck, Check } from 'lucide-react';
 const Checkout = () => {
   const { cartItems, getCartTotal, clearCart } = useCart();
   const navigate = useNavigate();
+
   const [isProcessing, setIsProcessing] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState("card");
   const [orderSuccess, setOrderSuccess] = useState(false);
 
+  const userId = localStorage.getItem("userId");
+
+  /* ---------------- PLACE ORDER ---------------- */
+  const placeOrder = async () => {
+    if (!userId || cartItems.length === 0) return;
+
+    try {
+      // 1️⃣ Fetch user
+      const userRes = await fetch(`http://localhost:5000/customers/${userId}`);
+      const user = await userRes.json();
+
+      if (user?.status !== "Active") {
+        alert("Your account is inactive. You cannot place orders.");
+        return;
+      }
+
+      const newOrder = {
+        id: "ORD_" + Date.now(),
+        userId,
+
+        customer: {
+          name: user.name,
+          email: user.email,
+          phone: formData.phone
+        },
+
+        shippingAddress: {
+          address: formData.address,
+          city: formData.city,
+          state: formData.state,
+          zip: formData.zip,
+          country: formData.country
+        },
+
+        payment: {
+          method: paymentMethod,
+          status: paymentMethod === "cod" ? "Pending" : "Paid"
+        },
+
+        items: cartItems.map(item => ({
+          productId: item.id,
+          name: item.name,
+          price: item.price,
+          qty: item.quantity,
+          image: item.image
+        })),
+
+        total: cartItems.reduce(
+          (sum, i) => sum + i.price * i.quantity,
+          0
+        ),
+
+        status: "Pending",
+        date: new Date().toISOString().split("T")[0]
+      };
+
+      // 3️⃣ Save order
+      await fetch("http://localhost:5000/orders", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newOrder)
+      });
+
+      // 4️⃣ Update customer stats
+      await fetch(`http://localhost:5000/customers/${userId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          orders: (user.orders || 0) + 1,
+          totalSpent: (user.totalSpent || 0) + newOrder.total
+        })
+      });
 
 
+    } catch (error) {
+      console.error("Order placement failed:", error);
+    }
+  };
+
+  /* ---------------- FORM STATE ---------------- */
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -41,18 +120,17 @@ const Checkout = () => {
     setIsProcessing(true);
 
     setTimeout(() => {
-      clearCart();          // clear cart
+      clearCart();
       setIsProcessing(false);
-      setOrderSuccess(true); // show modal
+      setOrderSuccess(true);
     }, 2000);
   };
-
 
   if (cartItems.length === 0 && !orderSuccess) {
     return (
       <Layout>
         <div className="container-custom" style={{ padding: '4rem 0', textAlign: 'center' }}>
-          <h1 style={{ fontSize: '1.875rem', fontWeight: '700', marginBottom: '1rem' }}>Your cart is empty</h1>
+          <h1>Your cart is empty</h1>
           <Link to="/category" className="btn-primary">
             Continue Shopping
           </Link>
@@ -60,7 +138,6 @@ const Checkout = () => {
       </Layout>
     );
   }
-
   return (
 
     <Layout>
@@ -316,6 +393,7 @@ const Checkout = () => {
                       className="btn-primary"
                       style={{ width: '100%', justifyContent: 'center', marginTop: '1rem' }}
                       disabled={isProcessing}
+                      onClick={placeOrder}
                     >
                       {isProcessing ? 'Processing...' : 'Place Order'}
                       {!isProcessing && <Check size={18} />}

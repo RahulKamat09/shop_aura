@@ -959,7 +959,7 @@
       "name": "Electronics",
       "slug": "/electronics",
       "gender": "men",
-      "products": 10,
+      "products": 11,
       "image": "https://bootstrapmade.com/content/demo/eStore/assets/img/product/product-f-1.webp"
     },
     {
@@ -979,54 +979,114 @@
   ],
   "orders": [
     {
-      "id": "ORD-001",
+      "id": "ORD_1767683450848",
+      "userId": "u_1767419350577",
       "customer": {
-        "name": "John Doe",
-        "email": "john@example.com"
+        "name": "Rahul Kamat",
+        "email": "kamatrahul415@gmail.com",
+        "phone": "7203806609"
       },
-      "date": "2024-12-12",
+      "shippingAddress": {
+        "address": "BLOCK-B-SF-208 OM SHANTI GOLD PLUS-2 VATVA GAMDI ROAD VATVA",
+        "city": "AHMEDABAD",
+        "state": "Gujarat",
+        "zip": "382440",
+        "country": "United States"
+      },
+      "payment": {
+        "method": "cod",
+        "status": "Pending"
+      },
+      "items": [
+        {
+          "productId": "52",
+          "name": "Adjustable Dumbbell Set (20kg)",
+          "price": 149.99,
+          "qty": 1,
+          "image": "https://m.media-amazon.com/images/I/515uY4BSuYL._SX679_.jpg"
+        }
+      ],
+      "total": 149.99,
       "status": "Completed",
-      "total": 189.99
+      "date": "2026-01-06"
     },
     {
-      "id": "ORD-002",
+      "id": "ORD_1767683655704",
+      "userId": "u_1767419350577",
       "customer": {
-        "name": "Jane Smith",
-        "email": "jane@example.com"
+        "name": "Rahul Kamat",
+        "email": "kamatrahul415@gmail.com",
+        "phone": "7203806609"
       },
-      "date": "2024-12-11",
-      "status": "Processing",
-      "total": 119
-    },
-    {
-      "id": "ORD-003",
-      "customer": {
-        "name": "Bob Wilson",
-        "email": "bob@example.com"
+      "shippingAddress": {
+        "address": "BLOCK-B-SF-208 OM SHANTI GOLD PLUS-2 VATVA GAMDI ROAD VATVA",
+        "city": "AHMEDABAD",
+        "state": "Gujarat",
+        "zip": "382440",
+        "country": "United States"
       },
-      "date": "2024-12-10",
+      "payment": {
+        "method": "upi",
+        "status": "Paid"
+      },
+      "items": [
+        {
+          "productId": "22",
+          "name": "Gold Plated Minimalist Bracelet",
+          "price": 249.99,
+          "qty": 1,
+          "image": "https://m.media-amazon.com/images/I/61uFm+tYrFL._SY675_.jpg"
+        }
+      ],
+      "total": 249.99,
       "status": "Completed",
-      "total": 324.99
+      "date": "2026-01-06"
     },
     {
-      "id": "ORD-004",
+      "id": "ORD_1767685251154",
+      "userId": "u_1767419350577",
       "customer": {
-        "name": "Alice Brown",
-        "email": "alice@example.com"
+        "name": "Rahul Kamat",
+        "email": "kamatrahul415@gmail.com",
+        "phone": "9898989898"
       },
-      "date": "2024-12-09",
-      "status": "Cancelled",
-      "total": 75.5
-    },
-    {
-      "id": "ORD-005",
-      "customer": {
-        "name": "Charlie Davis",
-        "email": "charlie@example.com"
+      "shippingAddress": {
+        "address": "BLOCK-B-SF-208 OM SHANTI GOLD PLUS-2 VATVA GAMDI ROAD VATVA",
+        "city": "AHMEDABAD",
+        "state": "Gujarat",
+        "zip": "382440",
+        "country": "United States"
       },
-      "date": "2024-12-08",
+      "payment": {
+        "method": "cod",
+        "status": "Pending"
+      },
+      "items": [
+        {
+          "productId": "1",
+          "name": "Men’s Premium Cotton Casual Shirt",
+          "price": 87.99,
+          "qty": 1,
+          "image": "https://m.media-amazon.com/images/I/51jT9G0QYhL._SY741_.jpg"
+        },
+        {
+          "productId": "44",
+          "name": "Smart Wireless Charging Pad",
+          "price": 34.99,
+          "qty": 1,
+          "image": "https://m.media-amazon.com/images/I/410qG39NZkL.jpg"
+        },
+        {
+          "productId": "42",
+          "name": "Smart Home Wi-Fi Security Camera",
+          "price": 159.99,
+          "qty": 1,
+          "image": "https://m.media-amazon.com/images/I/51ASv7xNKhL._SX679_.jpg"
+        }
+      ],
+      "total": 282.97,
       "status": "Completed",
-      "total": 259.98
+      "date": "2026-01-06"
     }
   ],
   "customers": [
@@ -1048,8 +1108,8 @@
       "phone": "7203806609",
       "password": "Rahul1234",
       "registered": "2026-01-03",
-      "orders": 0,
-      "totalSpent": 0,
+      "orders": 1,
+      "totalSpent": 282.97,
       "status": "Active"
     }
   ],

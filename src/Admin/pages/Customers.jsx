@@ -23,6 +23,22 @@ function Customers() {
       .then(data => setOrders(data));
   }, []);
 
+  useEffect(() => {
+    const syncData = () => {
+      fetch('http://localhost:5000/customers')
+        .then(res => res.json())
+        .then(setCustomers);
+
+      fetch('http://localhost:5000/orders')
+        .then(res => res.json())
+        .then(setOrders);
+    };
+
+    window.addEventListener("storage", syncData);
+    return () => window.removeEventListener("storage", syncData);
+  }, []);
+
+
   if (!customers.length) {
     return (
       <p style={{ padding: '2rem', textAlign: 'center' }}>
@@ -43,7 +59,10 @@ function Customers() {
     currentPage * ITEMS_PER_PAGE
   );
 
-  const totalRevenue = customers.reduce((sum, c) => sum + c.totalSpent, 0);
+  const totalRevenue = customers.reduce(
+    (sum, c) => sum + (c.totalSpent || 0),
+    0
+  );
   const activeCustomers = customers.filter(c => c.status === 'Active').length;
 
   const handleViewCustomer = (customer) => {
@@ -56,9 +75,22 @@ function Customers() {
     setViewingCustomer(null);
   };
 
+  // 🔢 Calculate orders count for a customer
+  const getOrderCount = (customerId) => {
+    return orders.filter(o => o.userId === customerId).length;
+  };
+
+  // 💰 Calculate total spent for a customer
+  const getTotalSpent = (customerId) => {
+    return orders
+      .filter(o => o.userId === customerId)
+      .reduce((sum, o) => sum + (o.total || 0), 0);
+  };
+
+
   // Get customer's orders
-  const getCustomerOrders = (customerName) => {
-    return orders.filter(o => o.customer.name === customerName);
+  const getCustomerOrders = (customerId) => {
+    return orders.filter(o => o.userId === customerId);
   };
 
   const updateStatus = async (id, status) => {
@@ -164,10 +196,14 @@ function Customers() {
                 </td>
                 <td>{customer.phone}</td>
                 <td>{customer.registered}</td>
-                <td style={{ textAlign: 'center' }}>{customer.orders}</td>
-                <td style={{ color: 'var(--admin-success)', fontWeight: 500 }}>
-                  ${customer.totalSpent.toFixed(2)}
+                <td style={{ textAlign: 'center' }}>
+                  {getOrderCount(customer.id)}
                 </td>
+
+                <td style={{ color: 'var(--admin-success)', fontWeight: 500 }}>
+                  ${getTotalSpent(customer.id).toFixed(2)}
+                </td>
+
                 <td>
                   <span className={`status-badge ${customer.status === 'Active' ? 'active' : 'inactive'}`}>
                     {customer.status}
@@ -295,8 +331,8 @@ function Customers() {
             <div className="detail-section">
               <h4 className="detail-section-title">Recent Orders</h4>
               <div className="customer-orders-list">
-                {getCustomerOrders(viewingCustomer.name).length > 0 ? (
-                  getCustomerOrders(viewingCustomer.name).map(order => (
+                {getCustomerOrders(viewingCustomer.id).length > 0 ? (
+                  getCustomerOrders(viewingCustomer.id).map(order => (
                     <div key={order.id} className="customer-order-item">
                       <div>
                         <span className="order-id">{order.id}</span>

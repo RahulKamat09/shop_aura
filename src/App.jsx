@@ -15,6 +15,7 @@ import AuthPage from "./Client/components/auth/AuthPage";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import PublicAuthRoute from "./routes/PublicAuthRoute";
 import AdminProtectedRoute from "./routes/AdminProtectedRoute";
+import OrderProductPage from "./Client/pages/OrderProductPage";
 
 const App = () => (
   <CartProvider>
@@ -31,6 +32,7 @@ const App = () => (
         <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
         <Route path="/admin/*" element={<AdminProtectedRoute><AdminApp /></AdminProtectedRoute>} />
         <Route path="/auth" element={<PublicAuthRoute><AuthPage /></PublicAuthRoute>} />
+        <Route path="/order/:orderId" element={<OrderProductPage />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>

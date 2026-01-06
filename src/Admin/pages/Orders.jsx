@@ -14,7 +14,9 @@ function Orders() {
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [viewingOrder, setViewingOrder] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [loading, setLoading] = useState(true);
 
+  /* ---------------- FETCH DATA ---------------- */
   useEffect(() => {
     const loadData = async () => {
       try {
@@ -23,53 +25,19 @@ function Orders() {
           api.get("/products"),
         ]);
 
-        setOrders(ordersRes.data);
-        setProducts(productsRes.data);
+        setOrders(ordersRes.data || []);
+        setProducts(productsRes.data || []);
       } catch (error) {
         console.error("Failed to load data", error);
+      } finally {
+        setLoading(false);
       }
     };
 
     loadData();
   }, []);
 
-  // Admin Order Actions (ADD ONLY)
-  const handleAdminAction = async (orderId, action) => {
-    let newStatus = "";
-
-    switch (action) {
-      case "confirm":
-        newStatus = "Processing";
-        break;
-      case "complete":
-        newStatus = "Completed";
-        break;
-      case "cancel":
-        newStatus = "Cancelled";
-        break;
-      default:
-        return;
-    }
-
-    try {
-      await api.patch(`/orders/${orderId}`, { status: newStatus });
-
-      setOrders(prev =>
-        prev.map(order =>
-          order.id === orderId ? { ...order, status: newStatus } : order
-        )
-      );
-    } catch (error) {
-      console.error("Order update failed", error);
-    }
-  };
-
-
-  // CRUD Operations
-  const updateOrderStatus = (id, status) => {
-    setOrders(orders.map(o => o.id === id ? { ...o, status } : o));
-  };
-
+  /* ---------------- FILTERS ---------------- */
   const filters = [
     { id: 'all', label: 'All', count: orders.length },
     { id: 'pending', label: 'Pending', count: orders.filter(o => o.status === 'Pending').length },
@@ -79,25 +47,44 @@ function Orders() {
   ];
 
   const filteredOrders = orders.filter(order => {
-    const matchesSearch =
-      order.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      order.customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      order.customer.email.toLowerCase().includes(searchTerm.toLowerCase());
+    const search = searchTerm.toLowerCase();
 
-    const matchesFilter = activeFilter === 'all' || order.status.toLowerCase() === activeFilter;
+    const matchesSearch =
+      order?.id?.toLowerCase().includes(search) ||
+      order?.customer?.name?.toLowerCase().includes(search) ||
+      order?.customer?.email?.toLowerCase().includes(search);
+
+    const matchesFilter =
+      activeFilter === 'all' ||
+      order?.status?.toLowerCase() === activeFilter;
 
     return matchesSearch && matchesFilter;
   });
 
-  // Pagination
+  /* ---------------- PAGINATION ---------------- */
   const totalPages = Math.ceil(filteredOrders.length / ITEMS_PER_PAGE);
   const paginatedOrders = filteredOrders.slice(
     (currentPage - 1) * ITEMS_PER_PAGE,
     currentPage * ITEMS_PER_PAGE
   );
 
-  const handleStatusChange = (orderId, newStatus) => {
-    updateOrderStatus(orderId, newStatus);
+  /* ---------------- STATUS UPDATE ---------------- */
+  const handleStatusChange = async (orderId, newStatus) => {
+    try {
+      await api.patch(`/orders/${orderId}`, { status: newStatus });
+
+      setOrders(prev =>
+        prev.map(order =>
+          order.id === orderId
+            ? { ...order, status: newStatus }
+            : order
+        )
+      );
+
+      localStorage.setItem("ordersUpdated", Date.now());
+    } catch (err) {
+      console.error("Failed to update order status", err);
+    }
   };
 
   const handleViewOrder = (order) => {
@@ -110,7 +97,7 @@ function Orders() {
     setViewingOrder(null);
   };
 
-  const getStatusClass = (status) => {
+  const getStatusClass = (status = '') => {
     switch (status.toLowerCase()) {
       case 'completed': return 'completed';
       case 'processing': return 'processing';
@@ -120,7 +107,7 @@ function Orders() {
     }
   };
 
-  if (!orders.length) {
+  if (loading) {
     return (
       <p style={{ padding: '2rem', textAlign: 'center' }}>
         Loading orders...
@@ -257,7 +244,12 @@ function Orders() {
                 <MapPin size={18} />
                 <div>
                   <span className="detail-label">Shipping Address</span>
-                  <p className="detail-value">123 Main St, City, State 12345</p>
+                  <p className="detail-value">
+                    {viewingOrder.shippingAddress?.address}, {viewingOrder.shippingAddress?.city},<br />
+                    {viewingOrder.shippingAddress?.state} {viewingOrder.shippingAddress?.zip},
+                    {viewingOrder.shippingAddress?.country}
+                  </p>
+
                 </div>
               </div>
             </div>
@@ -275,7 +267,11 @@ function Orders() {
                 <CreditCard size={18} />
                 <div>
                   <span className="detail-label">Payment Method</span>
-                  <p className="detail-value">Credit Card ending in 4242</p>
+                  <p className="detail-value">
+                    {viewingOrder.payment?.method?.toUpperCase()} <br />
+                    Status: {viewingOrder.payment?.status}
+                  </p>
+
                 </div>
               </div>
             </div>
@@ -283,14 +279,22 @@ function Orders() {
             <div className="detail-section">
               <h4 className="detail-section-title">Order Items</h4>
               <div className="order-items-list">
-                {products.slice(0, 2).map((item, index) => (
+                {viewingOrder.items.map((item, index) => (
                   <div key={index} className="order-item">
-                    <img src={item.image} alt={item.name} className="order-item-image" />
+                    <img
+                      src={item.image}
+                      alt={item.name}
+                      className="order-item-image"
+                    />
                     <div className="order-item-info">
                       <h5>{item.name}</h5>
-                      <p>Qty: 1 × ${item.price.toFixed(2)}</p>
+                      <p>
+                        Qty: {item.qty} × ${item.price.toFixed(2)}
+                      </p>
                     </div>
-                    <span className="order-item-price">${item.price.toFixed(2)}</span>
+                    <span className="order-item-price">
+                      ${(item.price * item.qty).toFixed(2)}
+                    </span>
                   </div>
                 ))}
               </div>
