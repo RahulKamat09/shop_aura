@@ -20,7 +20,7 @@
     "react-dom": "^19.2.0",
     "react-router-dom": "^7.10.1"
   },
-  "homepage": "https://github.com/RahulKamat09/shop_aura",
+  "homepage": "https://rahulkamat09.github.io/shop_aura",
   "devDependencies": {
     "@eslint/js": "^9.39.1",
     "@types/react": "^19.2.5",
