@@ -1087,6 +1087,38 @@
       "total": 282.97,
       "status": "Completed",
       "date": "2026-01-06"
+    },
+    {
+      "id": "ORD_1767688163909",
+      "userId": "u_1767419350577",
+      "customer": {
+        "name": "Rahul Kamat",
+        "email": "kamatrahul415@gmail.com",
+        "phone": "7203806609"
+      },
+      "shippingAddress": {
+        "address": "BLOCK-B-SF-208 OM SHANTI GOLD PLUS-2 VATVA GAMDI ROAD VATVA",
+        "city": "AHMEDABAD",
+        "state": "Gujarat",
+        "zip": "382440",
+        "country": "United States"
+      },
+      "payment": {
+        "method": "cod",
+        "status": "Pending"
+      },
+      "items": [
+        {
+          "productId": "51",
+          "name": "Professional Football Training Ball",
+          "price": 39.99,
+          "qty": 1,
+          "image": "https://m.media-amazon.com/images/I/41BlH7crIGL._SY300_SX300_QL70_FMwebp_.jpg"
+        }
+      ],
+      "total": 39.99,
+      "status": "Pending",
+      "date": "2026-01-06"
     }
   ],
   "customers": [
@@ -1108,8 +1140,8 @@
       "phone": "7203806609",
       "password": "Rahul1234",
       "registered": "2026-01-03",
-      "orders": 1,
-      "totalSpent": 282.97,
+      "orders": 2,
+      "totalSpent": 322.96000000000004,
       "status": "Active"
     }
   ],
