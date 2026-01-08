@@ -1119,6 +1119,38 @@
       "total": 39.99,
       "status": "Pending",
       "date": "2026-01-06"
+    },
+    {
+      "id": "ORD_1767853172604",
+      "userId": "u_1767419350577",
+      "customer": {
+        "name": "Rahul Kamat",
+        "email": "kamatrahul415@gmail.com",
+        "phone": "7203806609"
+      },
+      "shippingAddress": {
+        "address": "BLOCK-B-SF-208 OM SHANTI GOLD PLUS-2 VATVA GAMDI ROAD VATVA",
+        "city": "AHMEDABAD",
+        "state": "Gujarat",
+        "zip": "382440",
+        "country": "United States"
+      },
+      "payment": {
+        "method": "upi",
+        "status": "Paid"
+      },
+      "items": [
+        {
+          "productId": "22",
+          "name": "Gold Plated Minimalist Bracelet",
+          "price": 249.99,
+          "qty": 1,
+          "image": "https://m.media-amazon.com/images/I/61uFm+tYrFL._SY675_.jpg"
+        }
+      ],
+      "total": 249.99,
+      "status": "Pending",
+      "date": "2026-01-08"
     }
   ],
   "customers": [
@@ -1140,8 +1172,8 @@
       "phone": "7203806609",
       "password": "Rahul1234",
       "registered": "2026-01-03",
-      "orders": 2,
-      "totalSpent": 322.96000000000004,
+      "orders": 3,
+      "totalSpent": 572.95,
       "status": "Active"
     }
   ],

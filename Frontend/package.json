@@ -8,9 +8,7 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "server": "json-server --watch db.json --port 5000",
-    "predeploy": "npm run build",
-    "deploy": "gh-pages -d dist"
+    "server": "json-server --watch db.json --port 5000"
   },
   "dependencies": {
     "axios": "^1.13.2",
@@ -20,7 +18,6 @@
     "react-dom": "^19.2.0",
     "react-router-dom": "^7.10.1"
   },
-  "homepage": "https://rahulkamat09.github.io/shop_aura/",
   "devDependencies": {
     "@eslint/js": "^9.39.1",
     "@types/react": "^19.2.5",
