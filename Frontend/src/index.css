@@ -2443,16 +2443,6 @@ textarea {
   }
 }
 
-/* Optional: Extra small phones */
-@media (max-width: 400px) {
-
-  .products-grid-3,
-  .grid-2 {
-    grid-template-columns: 1fr;
-  }
-}
-
-
 
 /* =========================
    ANIMATIONS
