@@ -2430,7 +2430,21 @@ textarea {
   }
 }
 
+/* =========================
+   MOBILE PRODUCT GRID FIX
+========================= */
+
 @media (max-width: 640px) {
+
+  .products-grid-3,
+  .grid-2 {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+}
+
+/* Optional: Extra small phones */
+@media (max-width: 400px) {
 
   .products-grid-3,
   .grid-2 {
@@ -2497,5 +2511,19 @@ textarea {
   .mobile-filter-btn {
     display: flex;
     margin-bottom: 1rem;
+  }
+}
+
+.filterExtra{
+  padding: 10px;
+}
+
+.productExtra{
+  padding: 10px;
+}
+
+@media (max-width: 768px) {
+  .products-toolbar button.btn-icon {
+    display: none;
   }
 }

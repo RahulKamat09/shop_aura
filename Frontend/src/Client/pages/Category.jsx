@@ -285,7 +285,7 @@ const Category = () => {
           <>
             <h2 style={{ marginBottom: '1.5rem', textAlign: 'center' }}>Browse Categories</h2>
 
-            <div className="grid-4">
+            <div className="grid-4 productExtra">
               {allCategories.map((cat, index) => (
                 <div
                   key={cat.id}
@@ -330,13 +330,15 @@ const Category = () => {
         {!loading && !showCategories && (
           <>
             {/* Mobile Filter Button */}
-            <button
-              onClick={() => setShowMobileFilters(true)}
-              className="btn-primary mobile-filter-btn"
-            >
-              <Filter size={18} />
-              <span style={{ marginLeft: '0.5rem' }}>Filters</span>
-            </button>
+            <div className="filterExtra">
+              <button
+                onClick={() => setShowMobileFilters(true)}
+                className="btn-primary mobile-filter-btn"
+              >
+                <Filter size={18} />
+                <span style={{ marginLeft: '0.5rem' }}>Filters</span>
+              </button>
+            </div>
 
             {/* Mobile Filter Modal */}
             {showMobileFilters && (
@@ -472,7 +474,7 @@ const Category = () => {
                   {paginatedProducts.map((product, index) => (
                     <div
                       key={product.id}
-                      className="animate-fade-in"
+                      className="animate-fade-in productExtra"
                       style={{ animationDelay: `${index * 0.05}s` }}
                     >
                       <ProductCard product={product} />
