@@ -8,6 +8,16 @@ function AHeader({ onToggleSidebar, sidebarOpen, onNavigate }) {
   const [showProfile, setShowProfile] = useState(false);
   const navigate = useNavigate();
 
+  const handleLogout = () => {
+    if (!window.confirm("Are you sure you want to logout?")) return;
+    // Clear admin & user session safely
+    localStorage.removeItem("adminToken");
+    localStorage.removeItem("token");
+    localStorage.removeItem("userId");
+    // Redirect to auth page
+    navigate("/auth", { replace: true });
+  };
+
   const notifications = [
     { id: 1, title: 'New order received', time: '2 min ago', unread: true },
     { id: 2, title: 'Payment confirmed', time: '1 hour ago', unread: true },
@@ -128,7 +138,7 @@ function AHeader({ onToggleSidebar, sidebarOpen, onNavigate }) {
               </div>
               <div className="dropdown-divider"></div>
               <div className="dropdown-content">
-                <button className="dropdown-item logout">
+                <button className="dropdown-item logout" onClick={handleLogout}>
                   Logout
                 </button>
               </div>
