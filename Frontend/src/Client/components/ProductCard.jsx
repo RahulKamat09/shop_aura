@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Star, Heart, ShoppingCart, Eye } from 'lucide-react';
 import { useCart } from '../context/CartContext';
+import toast from 'react-hot-toast';
 
 const ProductCard = ({ product }) => {
   const [isHovered, setIsHovered] = useState(false);
@@ -12,7 +13,8 @@ const ProductCard = ({ product }) => {
     e.preventDefault();
     if (!product.inStock) return;
     addToCart(product);
-    alert(`${product.name} has been added to your cart.`);
+    toast.success(`${product.name} has been added to your cart.`)
+    // alert(`${product.name} has been added to your cart.`);
   };
 
   const handleWishlist = (e) => {

@@ -17,11 +17,24 @@ import PublicAuthRoute from "./routes/PublicAuthRoute";
 import AdminProtectedRoute from "./routes/AdminProtectedRoute";
 import OrderProductPage from "./Client/pages/OrderProductPage";
 import ScrollToTop from "./Client/components/ScrollToTop";
+import { Toaster } from "react-hot-toast";
 
 const App = () => (
   <CartProvider>
     <BrowserRouter>
-    <ScrollToTop/>
+      <Toaster
+        position="top-right"
+        reverseOrder={false}
+        toastOptions={{
+          duration: 3000,
+          style: {
+            borderRadius: '10px',
+            background: '#1f2933',
+            color: '#fff',
+          },
+        }}
+      />
+      <ScrollToTop />
       <Routes>
         <Route path="/" element={<Index />} />
         <Route path="/about" element={<About />} />

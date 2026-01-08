@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useState } from 'react';
+import toast from 'react-hot-toast';
 
 const CartContext = createContext(undefined);
 
@@ -77,6 +78,7 @@ export const CartProvider = ({ children }) => {
       if (prev.find(item => item.id === product.id)) {
         return prev;
       }
+      toast.success(`${product.name} has been added to your Wishlist.`);
       return [...prev, product];
     });
   };
