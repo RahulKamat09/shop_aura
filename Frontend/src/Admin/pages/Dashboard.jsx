@@ -23,7 +23,7 @@ function Dashboard({ onNavigate }) {
           await Promise.all([
             fetch('https://shop-aura.onrender.com/products'),
             fetch('https://shop-aura.onrender.com/orders'),
-            fetch('https://shop-aura.onrender.com/messeges'),
+            fetch('https://shop-aura.onrender.com/messages'),
             fetch('https://shop-aura.onrender.com/customers'),
           ]);
 
