@@ -16,10 +16,12 @@ import ProtectedRoute from "./routes/ProtectedRoute";
 import PublicAuthRoute from "./routes/PublicAuthRoute";
 import AdminProtectedRoute from "./routes/AdminProtectedRoute";
 import OrderProductPage from "./Client/pages/OrderProductPage";
+import ScrollToTop from "./Client/components/ScrollToTop";
 
 const App = () => (
   <CartProvider>
     <BrowserRouter>
+    <ScrollToTop/>
       <Routes>
         <Route path="/" element={<Index />} />
         <Route path="/about" element={<About />} />
