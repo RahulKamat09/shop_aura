@@ -16,7 +16,7 @@ const Profile = () => {
   useEffect(() => {
     if (!userId) return;
 
-    fetch(`http://localhost:5000/orders?userId=${userId}`)
+    fetch(`https://shop-aura.onrender.com/orders?userId=${userId}`)
       .then(res => res.json())
       .then(data => setOrders(data || []))
       .catch(err => console.error("Order fetch error:", err));
@@ -26,7 +26,7 @@ const Profile = () => {
   useEffect(() => {
     if (!userId) return;
 
-    fetch(`http://localhost:5000/customers/${userId}`)
+    fetch(`https://shop-aura.onrender.com/customers/${userId}`)
       .then(res => res.json())
       .then(data => {
         const name = data?.name || "";

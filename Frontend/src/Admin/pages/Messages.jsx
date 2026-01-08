@@ -17,7 +17,7 @@ function Messages() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('http://localhost:5000/messages')
+    fetch('https://shop-aura.onrender.com/messeges')
       .then(res => res.json())
       .then(data => {
         // ⏳ 1 second delay

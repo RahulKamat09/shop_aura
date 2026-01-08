@@ -10,7 +10,7 @@ function Settings() {
   });
 
   useEffect(() => {
-    fetch("http://localhost:5000/admin")
+    fetch("https://shop-aura.onrender.com/admin")
       .then(res => res.json())
       .then(data => {
         setAdmin({
@@ -22,7 +22,7 @@ function Settings() {
   }, []);
 
   const handleAdminSave = async () => {
-    await fetch("http://localhost:5000/admin", {
+    await fetch("https://shop-aura.onrender.com/admin", {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({

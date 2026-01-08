@@ -33,7 +33,7 @@ const AuthPage = () => {
 
         if (!isLogin) {
             // 🔍 Check for duplicate email or phone
-            const res = await fetch("http://localhost:5000/customers");
+            const res = await fetch("https://shop-aura.onrender.com/customers");
             const customers = await res.json();
 
             const emailExists = customers.some(
@@ -69,7 +69,7 @@ const AuthPage = () => {
                 status: "Active",
             };
 
-            await fetch("http://localhost:5000/customers", {
+            await fetch("https://shop-aura.onrender.com/customers", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(newCustomer),
@@ -81,7 +81,7 @@ const AuthPage = () => {
             // =========================
             // 🔐 ADMIN LOGIN (FIRST)
             // =========================
-            const adminRes = await fetch("http://localhost:5000/admin");
+            const adminRes = await fetch("https://shop-aura.onrender.com/admin");
             const admin = await adminRes.json();
 
             if (
@@ -106,7 +106,7 @@ const AuthPage = () => {
             // 🔐 USER LOGIN
             // =========================
             const res = await fetch(
-                `http://localhost:5000/customers?email=${formData.email}&password=${formData.password}`
+                `https://shop-aura.onrender.com/customers?email=${formData.email}&password=${formData.password}`
             );
             const user = await res.json();
 

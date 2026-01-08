@@ -9,7 +9,7 @@ const OrderProductPage = () => {
     const [order, setOrder] = useState(null);
 
     useEffect(() => {
-        fetch(`http://localhost:5000/orders/${orderId}`)
+        fetch(`https://shop-aura.onrender.com/orders/${orderId}`)
             .then(res => res.json())
             .then(data => setOrder(data))
             .catch(err => console.error(err));

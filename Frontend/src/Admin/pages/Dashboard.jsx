@@ -21,10 +21,10 @@ function Dashboard({ onNavigate }) {
       try {
         const [productsRes, ordersRes, messagesRes, customersRes] =
           await Promise.all([
-            fetch('http://localhost:5000/products'),
-            fetch('http://localhost:5000/orders'),
-            fetch('http://localhost:5000/messages'),
-            fetch('http://localhost:5000/customers'),
+            fetch('https://shop-aura.onrender.com/products'),
+            fetch('https://shop-aura.onrender.com/orders'),
+            fetch('https://shop-aura.onrender.com/messeges'),
+            fetch('https://shop-aura.onrender.com/customers'),
           ]);
 
         setProducts(await productsRes.json());

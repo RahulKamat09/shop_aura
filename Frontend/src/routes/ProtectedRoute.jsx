@@ -20,7 +20,7 @@ const ProtectedRoute = ({ children }) => {
     }
 
     useEffect(() => {
-        fetch(`http://localhost:5000/customers/${userId}`)
+        fetch(`https://shop-aura.onrender.com/customers/${userId}`)
             .then(res => res.json())
             .then(user => {
                 if (user.status === "Active") {

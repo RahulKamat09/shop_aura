@@ -18,7 +18,7 @@ const ProductDetails = () => {
   useEffect(() => {
     setLoading(true);
 
-    fetch(`http://localhost:5000/products/${id}`)
+    fetch(`https://shop-aura.onrender.com/products/${id}`)
       .then(res => res.json())
       .then(data => {
         setProduct(data);
@@ -27,7 +27,7 @@ const ProductDetails = () => {
 
         // Fetch related products
         fetch(
-          `http://localhost:5000/products?category=${data.category}&id_ne=${data.id}&_limit=4`
+          `https://shop-aura.onrender.com/products?category=${data.category}&id_ne=${data.id}&_limit=4`
         )
           .then(res => res.json())
           .then(related => setRelatedProducts(related));

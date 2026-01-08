@@ -14,22 +14,22 @@ function Customers() {
   const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
-    fetch('http://localhost:5000/customers')
+    fetch('https://shop-aura.onrender.com/customers')
       .then(res => res.json())
       .then(data => setCustomers(data));
 
-    fetch('http://localhost:5000/orders')
+    fetch('https://shop-aura.onrender.com/orders')
       .then(res => res.json())
       .then(data => setOrders(data));
   }, []);
 
   useEffect(() => {
     const syncData = () => {
-      fetch('http://localhost:5000/customers')
+      fetch('https://shop-aura.onrender.com/customers')
         .then(res => res.json())
         .then(setCustomers);
 
-      fetch('http://localhost:5000/orders')
+      fetch('https://shop-aura.onrender.com/orders')
         .then(res => res.json())
         .then(setOrders);
     };
@@ -94,7 +94,7 @@ function Customers() {
   };
 
   const updateStatus = async (id, status) => {
-    await fetch(`http://localhost:5000/customers/${id}`, {
+    await fetch(`https://shop-aura.onrender.com/customers/${id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ status }),
@@ -109,7 +109,7 @@ function Customers() {
     const confirmDelete = window.confirm("Are you sure you want to delete this customer?");
     if (!confirmDelete) return;
 
-    await fetch(`http://localhost:5000/customers/${id}`, {
+    await fetch(`https://shop-aura.onrender.com/customers/${id}`, {
       method: "DELETE",
     });
 

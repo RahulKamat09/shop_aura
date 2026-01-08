@@ -20,7 +20,7 @@ const Checkout = () => {
 
     try {
       // 1️⃣ Fetch user
-      const userRes = await fetch(`http://localhost:5000/customers/${userId}`);
+      const userRes = await fetch(`https://shop-aura.onrender.com/customers/${userId}`);
       const user = await userRes.json();
 
       if (user?.status !== "Active") {
@@ -69,14 +69,14 @@ const Checkout = () => {
       };
 
       // 3️⃣ Save order
-      await fetch("http://localhost:5000/orders", {
+      await fetch("https://shop-aura.onrender.com/orders", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newOrder)
       });
 
       // 4️⃣ Update customer stats
-      await fetch(`http://localhost:5000/customers/${userId}`, {
+      await fetch(`https://shop-aura.onrender.com/customers/${userId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
