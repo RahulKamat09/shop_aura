@@ -1,5 +1,7 @@
 import { Store, LayoutDashboard, Package, FolderOpen, ShoppingCart, Users, MessageSquare, Settings, ChevronLeft, LogOut, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+
 
 function Sidebar({ currentPage, onNavigate, sidebarCollapsed, setSidebarCollapsed, mobileSidebarOpen }) {
   const navItems = [
@@ -12,7 +14,37 @@ function Sidebar({ currentPage, onNavigate, sidebarCollapsed, setSidebarCollapse
     { id: 'settings', label: 'Settings', icon: Settings }
   ];
 
+  const [admin, setAdmin] = useState(null);
+  const adminToken = localStorage.getItem("adminToken");
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (adminToken !== "admin_logged_in") return;
+
+    fetch("https://shop-aura.onrender.com/admin")
+      .then(res => res.json())
+      .then(data => {
+        setAdmin({
+          name: data.name,
+          email: data.email,
+          avatar: data.avatar || null,
+        });
+      })
+      .catch(err => {
+        console.error("Sidebar admin fetch failed:", err);
+      });
+  }, [adminToken]);
+
+
+  const getInitials = (name = "") =>
+    name
+      .split(" ")
+      .map(word => word[0])
+      .join("")
+      .slice(0, 2)
+      .toUpperCase();
+
+
 
   const handleLogout = () => {
     if (!window.confirm("Are you sure you want to logout?")) return;
@@ -54,10 +86,10 @@ function Sidebar({ currentPage, onNavigate, sidebarCollapsed, setSidebarCollapse
 
       <div className="sidebar-footer">
         <div className="admin-user">
-          <div className="admin-user-avatar">AU</div>
+          <div className="admin-user-avatar">{admin ? getInitials(admin.name) : "AU"}</div>
           <div className="admin-user-info">
-            <h4>Admin User</h4>
-            <p>admin@estore.com</p>
+            <h4>{admin?.name || "Admin User"}</h4>
+            <p>{admin?.email || "admin@estore.com"}</p>
           </div>
         </div>
         <button className="logout-btn" onClick={handleLogout}>

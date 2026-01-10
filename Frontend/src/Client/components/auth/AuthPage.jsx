@@ -44,6 +44,12 @@ const AuthPage = () => {
                 formData.phone &&
                 customers.some((c) => c.phone === formData.phone);
 
+            if (formData.password !== formData.confirmPassword) {
+                alert("Passwords do not match");
+                setIsLoading(false);
+                return;
+            }
+
             if (emailExists) {
                 alert("This email is already registered");
                 setIsLoading(false);
@@ -62,21 +68,27 @@ const AuthPage = () => {
                 name: formData.name,
                 email: formData.email,
                 phone: formData.phone || "",
-                password: formData.password, // plain for now
+                password: formData.password,
                 registered: new Date().toISOString().split("T")[0],
-                orders: 0,
-                totalSpent: 0,
                 status: "Active",
             };
 
-            await fetch("https://shop-aura.onrender.com/customers", {
+            const createRes = await fetch("https://shop-aura.onrender.com/customers", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(newCustomer),
             });
 
+            if (!createRes.ok) {
+                alert("Signup failed");
+                setIsLoading(false);
+                return;
+            }
+
+            const savedUser = await createRes.json();
+
             localStorage.setItem("token", "user_logged_in");
-            localStorage.setItem("userId", newCustomer.id);
+            localStorage.setItem("userId", savedUser.id);
         } else {
             // =========================
             // 🔐 ADMIN LOGIN (FIRST)
@@ -99,9 +111,6 @@ const AuthPage = () => {
             }
 
 
-            // =========================
-            // 🔐 USER LOGIN
-            // =========================
             // =========================
             // 🔐 USER LOGIN
             // =========================

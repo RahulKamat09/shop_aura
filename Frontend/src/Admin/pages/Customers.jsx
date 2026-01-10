@@ -1,55 +1,69 @@
-import { useEffect, useState } from 'react';
-import { Search, Eye, Users, UserCheck, DollarSign, Mail, Phone, Calendar, ShoppingBag, MapPin, Trash2 } from 'lucide-react';
-import AModal from '../components/AModal';
-import Pagination from '../components/Pagination';
+import { useEffect, useState } from "react";
+import {
+  Search,
+  Eye,
+  Users,
+  UserCheck,
+  DollarSign,
+  Mail,
+  Phone,
+  Calendar,
+  ShoppingBag,
+  MapPin,
+  Trash2,
+} from "lucide-react";
+
+import AModal from "../components/AModal";
+import Pagination from "../components/Pagination";
 
 const ITEMS_PER_PAGE = 5;
 
+/**
+ * Customers Page
+ * - Displays all customers
+ * - Calculates orders & revenue from orders collection
+ * - Allows status toggle & deletion
+ */
 function Customers() {
+  /* ===================== STATE ===================== */
   const [customers, setCustomers] = useState([]);
   const [orders, setOrders] = useState([]);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
-  const [viewingCustomer, setViewingCustomer] = useState(null);
+
+  const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
 
-  useEffect(() => {
-    fetch('https://shop-aura.onrender.com/customers')
-      .then(res => res.json())
-      .then(data => setCustomers(data));
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+  const [viewingCustomer, setViewingCustomer] = useState(null);
 
-    fetch('https://shop-aura.onrender.com/orders')
-      .then(res => res.json())
-      .then(data => setOrders(data));
+  /* ===================== DATA FETCH ===================== */
+  const fetchData = async () => {
+    try {
+      const [customersRes, ordersRes] = await Promise.all([
+        fetch("https://shop-aura.onrender.com/customers"),
+        fetch("https://shop-aura.onrender.com/orders"),
+      ]);
+
+      const customersData = await customersRes.json();
+      const ordersData = await ordersRes.json();
+
+      setCustomers(customersData);
+      setOrders(ordersData);
+    } catch (error) {
+      console.error("Failed to fetch customers/orders", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
   }, []);
 
-  useEffect(() => {
-    const syncData = () => {
-      fetch('https://shop-aura.onrender.com/customers')
-        .then(res => res.json())
-        .then(setCustomers);
+  /* ===================== DERIVED DATA ===================== */
 
-      fetch('https://shop-aura.onrender.com/orders')
-        .then(res => res.json())
-        .then(setOrders);
-    };
-
-    window.addEventListener("storage", syncData);
-    return () => window.removeEventListener("storage", syncData);
-  }, []);
-
-
-  if (!customers.length) {
-    return (
-      <p style={{ padding: '2rem', textAlign: 'center' }}>
-        Loading customers...
-      </p>
-    );
-  }
-
-  const filteredCustomers = customers.filter(c =>
-    c.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    c.email.toLowerCase().includes(searchTerm.toLowerCase())
+  // Search filter
+  const filteredCustomers = customers.filter(
+    (c) =>
+      c.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      c.email.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   // Pagination
@@ -59,11 +73,30 @@ function Customers() {
     currentPage * ITEMS_PER_PAGE
   );
 
-  const totalRevenue = customers.reduce(
-    (sum, c) => sum + (c.totalSpent || 0),
+  // Stats
+  const activeCustomers = customers.filter(
+    (c) => c.status === "Active"
+  ).length;
+
+  const totalRevenue = orders.reduce(
+    (sum, order) => sum + (order.total || 0),
     0
   );
-  const activeCustomers = customers.filter(c => c.status === 'Active').length;
+
+  /* ===================== HELPERS ===================== */
+
+  const getOrderCount = (customerId) =>
+    orders.filter((o) => o.userId === customerId).length;
+
+  const getTotalSpent = (customerId) =>
+    orders
+      .filter((o) => o.userId === customerId)
+      .reduce((sum, o) => sum + (o.total || 0), 0);
+
+  const getCustomerOrders = (customerId) =>
+    orders.filter((o) => o.userId === customerId);
+
+  /* ===================== ACTIONS ===================== */
 
   const handleViewCustomer = (customer) => {
     setViewingCustomer(customer);
@@ -71,51 +104,51 @@ function Customers() {
   };
 
   const handleCloseViewModal = () => {
-    setIsViewModalOpen(false);
     setViewingCustomer(null);
-  };
-
-  // 🔢 Calculate orders count for a customer
-  const getOrderCount = (customerId) => {
-    return orders.filter(o => o.userId === customerId).length;
-  };
-
-  // 💰 Calculate total spent for a customer
-  const getTotalSpent = (customerId) => {
-    return orders
-      .filter(o => o.userId === customerId)
-      .reduce((sum, o) => sum + (o.total || 0), 0);
-  };
-
-
-  // Get customer's orders
-  const getCustomerOrders = (customerId) => {
-    return orders.filter(o => o.userId === customerId);
+    setIsViewModalOpen(false);
   };
 
   const updateStatus = async (id, status) => {
-    await fetch(`https://shop-aura.onrender.com/customers/${id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ status }),
-    });
+    try {
+      await fetch(`https://shop-aura.onrender.com/customers/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status }),
+      });
 
-    setCustomers(prev =>
-      prev.map(c => (c.id === id ? { ...c, status } : c))
-    );
+      setCustomers((prev) =>
+        prev.map((c) => (c.id === id ? { ...c, status } : c))
+      );
+    } catch (error) {
+      console.error("Failed to update status", error);
+    }
   };
 
   const deleteCustomer = async (id) => {
-    const confirmDelete = window.confirm("Are you sure you want to delete this customer?");
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete this customer?"
+    );
     if (!confirmDelete) return;
 
-    await fetch(`https://shop-aura.onrender.com/customers/${id}`, {
-      method: "DELETE",
-    });
+    try {
+      await fetch(`https://shop-aura.onrender.com/customers/${id}`, {
+        method: "DELETE",
+      });
 
-    setCustomers(prev => prev.filter(c => c.id !== id));
+      setCustomers((prev) => prev.filter((c) => c.id !== id));
+    } catch (error) {
+      console.error("Failed to delete customer", error);
+    }
   };
 
+  /* ===================== LOADING ===================== */
+  if (!customers.length) {
+    return (
+      <p style={{ padding: "2rem", textAlign: "center" }}>
+        Loading customers...
+      </p>
+    );
+  }
 
   return (
     <div className="admin-content">
@@ -322,7 +355,7 @@ function Customers() {
                 <div>
                   <span className="detail-label">Total Spent</span>
                   <p className="detail-value" style={{ color: 'var(--admin-success)', fontWeight: 600 }}>
-                    ${viewingCustomer.totalSpent.toFixed(2)}
+                    ${getTotalSpent(viewingCustomer.id).toFixed(2)}
                   </p>
                 </div>
               </div>

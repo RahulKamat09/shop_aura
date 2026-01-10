@@ -246,52 +246,54 @@ function Products() {
         <div className="table-header">
           <h3 className="table-title">All Products ({filteredProducts.length})</h3>
         </div>
-        <table className="admin-table">
-          <thead>
-            <tr>
-              <th>Product</th>
-              <th>Category</th>
-              <th>Price</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {paginatedProducts.map(product => (
-              <tr key={product.id}>
-                <td>
-                  <div className="product-cell">
-                    <img src={product.image} alt={product.name} className="product-image" />
-                    <div className="product-info">
-                      <h4>{product.name}</h4>
-                      <p>ID: {product.id}</p>
-                    </div>
-                  </div>
-                </td>
-                <td>{product.category}</td>
-                <td>${product.price.toFixed(2)}</td>
-                <td>
-                  <span className={`status-badge ${product.status === 'In Stock' ? 'in-stock' : 'out-of-stock'}`}>
-                    {product.status}
-                  </span>
-                </td>
-                <td>
-                  <div className="actions-cell">
-                    <button className="btn-icon" onClick={() => handleViewProduct(product)}>
-                      <Eye size={18} />
-                    </button>
-                    <button className="btn-icon" onClick={() => handleOpenModal(product)}>
-                      <Edit2 size={18} />
-                    </button>
-                    <button className="btn-icon danger" onClick={() => handleDelete(product.id)}>
-                      <Trash2 size={18} />
-                    </button>
-                  </div>
-                </td>
+        <div className="table-scroll">
+          <table className="admin-table">
+            <thead>
+              <tr>
+                <th>Product</th>
+                <th>Category</th>
+                <th>Price</th>
+                <th>Status</th>
+                <th>Actions</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {paginatedProducts.map(product => (
+                <tr key={product.id}>
+                  <td>
+                    <div className="product-cell">
+                      <img src={product.image} alt={product.name} className="product-image" />
+                      <div className="product-info">
+                        <h4>{product.name}</h4>
+                        <p>ID: {product.id}</p>
+                      </div>
+                    </div>
+                  </td>
+                  <td>{product.category}</td>
+                  <td>${product.price.toFixed(2)}</td>
+                  <td>
+                    <span className={`status-badge ${product.status === 'In Stock' ? 'in-stock' : 'out-of-stock'}`}>
+                      {product.status}
+                    </span>
+                  </td>
+                  <td>
+                    <div className="actions-cell">
+                      <button className="btn-icon" onClick={() => handleViewProduct(product)}>
+                        <Eye size={18} />
+                      </button>
+                      <button className="btn-icon" onClick={() => handleOpenModal(product)}>
+                        <Edit2 size={18} />
+                      </button>
+                      <button className="btn-icon danger" onClick={() => handleDelete(product.id)}>
+                        <Trash2 size={18} />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
         <Pagination
           currentPage={currentPage}
           totalPages={totalPages}

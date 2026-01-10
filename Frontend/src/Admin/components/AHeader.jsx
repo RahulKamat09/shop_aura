@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Menu, Search, Bell, Settings, User, ChevronDown } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
@@ -7,6 +7,36 @@ function AHeader({ onToggleSidebar, sidebarOpen, onNavigate }) {
   const [showNotifications, setShowNotifications] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
   const navigate = useNavigate();
+
+  const [admin, setAdmin] = useState(null);
+  const adminToken = localStorage.getItem("adminToken");
+
+  useEffect(() => {
+    if (adminToken !== "admin_logged_in") return;
+
+    fetch("https://shop-aura.onrender.com/admin")
+      .then(res => res.json())
+      .then(data => {
+        setAdmin({
+          name: data.name,
+          email: data.email,
+          avatar: data.avatar || null,
+        });
+      })
+      .catch(err => {
+        console.error("Admin fetch failed:", err);
+      });
+  }, [adminToken]);
+
+
+  const getInitials = (name = "") =>
+    name
+      .split(" ")
+      .map(word => word[0])
+      .join("")
+      .slice(0, 2)
+      .toUpperCase();
+
 
   const handleLogout = () => {
     if (!window.confirm("Are you sure you want to logout?")) return;
@@ -111,27 +141,23 @@ function AHeader({ onToggleSidebar, sidebarOpen, onNavigate }) {
               setShowNotifications(false);
             }}
           >
-            <div className="header-avatar">AU</div>
-            <span className="header-username">Admin</span>
+            <div className="header-avatar">{admin ? getInitials(admin.name) : "AU"}</div>
+            <span className="header-username">{admin ? admin.name : "Admin"}</span>
             <ChevronDown size={16} />
           </button>
 
           {showProfile && (
             <div className="header-dropdown-menu profile-menu">
               <div className="profile-header">
-                <div className="profile-avatar">AU</div>
+                <div className="profile-avatar">{admin ? getInitials(admin.name) : "AU"}</div>
                 <div className="profile-info">
-                  <h4>Admin User</h4>
-                  <p>admin@estore.com</p>
+                  <h4>{admin?.name || "Admin User"}</h4>
+                  <p>{admin?.email || "admin@estore.com"}</p>
                 </div>
               </div>
               <div className="dropdown-divider"></div>
               <div className="dropdown-content">
-                <button className="dropdown-item">
-                  <User size={16} />
-                  My Profile
-                </button>
-                <button className="dropdown-item">
+                <button className="dropdown-item" onClick={() => onNavigate('settings')}>
                   <Settings size={16} />
                   Account Settings
                 </button>
