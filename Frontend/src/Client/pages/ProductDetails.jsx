@@ -4,6 +4,7 @@ import Layout from '../components/layout/Layout';
 import { useCart } from '../context/CartContext';
 import { Star, Heart, Minus, Plus, Truck, Shield, RotateCcw } from 'lucide-react';
 import ProductCard from '../components/ProductCard';
+import toast from 'react-hot-toast';
 
 const ProductDetails = () => {
   const { id } = useParams();
@@ -11,8 +12,13 @@ const ProductDetails = () => {
   const [relatedProducts, setRelatedProducts] = useState([]);
   const [quantity, setQuantity] = useState(1);
   const [selectedImage, setSelectedImage] = useState(null);
-  const { addToCart, addToWishlist, isInWishlist, removeFromWishlist } = useCart();
+  const { addToCart, addToWishlist, isInWishlist, removeFromWishlist, updateQuantity, cartItems } = useCart();
   const [loading, setLoading] = useState(true);
+
+  const cartItem = product
+    ? cartItems.find(item => item.id === product.id)
+    : null;
+
 
   /* ---------------- FETCH PRODUCT BY ID ---------------- */
   useEffect(() => {
@@ -39,10 +45,8 @@ const ProductDetails = () => {
   }, [id]);
 
   const handleAddToCart = () => {
-    for (let i = 0; i < quantity; i++) {
-      addToCart(product);
-    }
-    alert(`${quantity} x ${product.name} added to your cart.`);
+    addToCart(product); // ensures product exists in cart
+    updateQuantity(product.id, quantity);
   };
 
   const handleWishlist = () => {
@@ -137,13 +141,34 @@ const ProductDetails = () => {
 
               <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
                 <div className="quantity-selector">
-                  <button className="quantity-btn" onClick={() => setQuantity(Math.max(1, quantity - 1))}>
+                  <button
+                    className="quantity-btn"
+                    onClick={() => {
+                      if (cartItem) {
+                        updateQuantity(product.id, cartItem.quantity - 1); // 🔔 toast fires
+                      } else {
+                        setQuantity(Math.max(1, quantity - 1));
+                      }
+                    }}
+                  >
                     <Minus size={16} />
                   </button>
-                  <span style={{ width: '3rem', textAlign: 'center' }}>{quantity}</span>
-                  <button className="quantity-btn" onClick={() => setQuantity(quantity + 1)}>
+
+                  <span style={{ width: '3rem', textAlign: 'center' }}>{cartItem ? cartItem.quantity : quantity}</span>
+
+                  <button
+                    className="quantity-btn"
+                    onClick={() => {
+                      if (cartItem) {
+                        updateQuantity(product.id, cartItem.quantity + 1); // 🔔 toast fires
+                      } else {
+                        setQuantity(quantity + 1);
+                      }
+                    }}
+                  >
                     <Plus size={16} />
                   </button>
+
                 </div>
               </div>
 
@@ -258,21 +283,23 @@ const ProductDetails = () => {
       </div>
 
       {/* Related Products */}
-      {relatedProducts.length > 0 && (
-        <section style={{ padding: '3rem 0', backgroundColor: 'var(--secondary)' }}>
-          <div className="container-custom">
-            <h2 className="section-title" style={{ textAlign: 'center', marginBottom: '2rem' }}>Related Products</h2>
-            <div className="grid-4">
-              {relatedProducts.map((product, index) => (
-                <div key={product.id} className="animate-fade-in" style={{ animationDelay: `${index * 0.1}s` }}>
-                  <ProductCard product={product} />
-                </div>
-              ))}
+      {
+        relatedProducts.length > 0 && (
+          <section style={{ padding: '3rem 0', backgroundColor: 'var(--secondary)' }}>
+            <div className="container-custom">
+              <h2 className="section-title" style={{ textAlign: 'center', marginBottom: '2rem' }}>Related Products</h2>
+              <div className="grid-4">
+                {relatedProducts.map((product, index) => (
+                  <div key={product.id} className="animate-fade-in" style={{ animationDelay: `${index * 0.1}s` }}>
+                    <ProductCard product={product} />
+                  </div>
+                ))}
+              </div>
             </div>
-          </div>
-        </section>
-      )}
-    </Layout>
+          </section>
+        )
+      }
+    </Layout >
   );
 };
 

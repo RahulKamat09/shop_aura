@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom';
 
 const Profile = () => {
   const [orders, setOrders] = useState([]);
-  const { wishlistItems } = useCart();
+  const { wishlistItems, addToCart, removeFromWishlist } = useCart();
   const [activeTab, setActiveTab] = useState('profile');
   const [profile, setProfile] = useState(null);
 
@@ -262,10 +262,65 @@ const Profile = () => {
                   ) : (
                     <div className="grid-3">
                       {wishlistItems.map(item => (
-                        <div key={item.id} style={{ padding: '1rem', backgroundColor: 'var(--secondary)', borderRadius: 'var(--radius)' }}>
-                          <img src={item.image} alt={item.name} style={{ width: '100%', aspectRatio: '1', objectFit: 'cover', borderRadius: 'var(--radius)', marginBottom: '0.5rem' }} />
-                          <h4 style={{ fontSize: '0.875rem', marginBottom: '0.25rem' }}>{item.name}</h4>
-                          <p style={{ color: 'var(--primary)', fontWeight: '600' }}>${item.price.toFixed(2)}</p>
+                        <div
+                          key={item.id}
+                          style={{
+                            padding: '1rem',
+                            backgroundColor: 'var(--secondary)',
+                            borderRadius: 'var(--radius)',
+                            position: 'relative'
+                          }}
+                        >
+                          {/* ❌ Remove from wishlist */}
+                          <button
+                            onClick={() => removeFromWishlist(item.id)}
+                            style={{
+                              position: 'absolute',
+                              top: '8px',
+                              right: '8px',
+                              background: 'white',
+                              border: 'none',
+                              borderRadius: '50%',
+                              width: '28px',
+                              height: '28px',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              cursor: 'pointer',
+                              boxShadow: '0 2px 6px rgba(0,0,0,0.15)'
+                            }}
+                          >
+                            ✕
+                          </button>
+
+                          <img
+                            src={item.image}
+                            alt={item.name}
+                            style={{
+                              width: '100%',
+                              aspectRatio: '1',
+                              objectFit: 'cover',
+                              borderRadius: 'var(--radius)',
+                              marginBottom: '0.5rem'
+                            }}
+                          />
+
+                          <h4 style={{ fontSize: '0.875rem', marginBottom: '0.25rem' }}>
+                            {item.name}
+                          </h4>
+
+                          <p style={{ color: 'var(--primary)', fontWeight: '600', marginBottom: '0.5rem' }}>
+                            ${item.price.toFixed(2)}
+                          </p>
+
+                          {/* 🛒 Add to cart */}
+                          <button
+                            className="btn-primary"
+                            style={{ width: '100%', fontSize: '0.8rem', padding: '0.4rem' }}
+                            onClick={() => addToCart(item)}
+                          >
+                            Add to Cart
+                          </button>
                         </div>
                       ))}
                     </div>

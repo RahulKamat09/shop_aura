@@ -31,32 +31,59 @@ export const CartProvider = ({ children }) => {
   const addToCart = (product) => {
     setCartItems(prev => {
       const existing = prev.find(item => item.id === product.id);
+
       if (existing) {
+        toast.success(`${product.name} quantity increased`);
         return prev.map(item =>
           item.id === product.id
             ? { ...item, quantity: item.quantity + 1 }
             : item
         );
       }
+
+      toast.success(`${product.name} added to cart`);
       return [...prev, { ...product, quantity: 1 }];
     });
   };
 
+
   const removeFromCart = (productId) => {
-    setCartItems(prev => prev.filter(item => item.id !== productId));
+    setCartItems(prev => {
+      const product = prev.find(item => item.id === productId);
+
+      if (product) {
+        toast.error(`${product.name} removed from your cart`);
+      }
+
+      return prev.filter(item => item.id !== productId);
+    });
   };
+
 
   const updateQuantity = (productId, quantity) => {
     if (quantity <= 0) {
       removeFromCart(productId);
       return;
     }
-    setCartItems(prev =>
-      prev.map(item =>
+
+    setCartItems(prev => {
+      const product = prev.find(item => item.id === productId);
+
+      if (!product) return prev;
+
+      // 🔔 Simple toast based on action
+      if (quantity > product.quantity) {
+        toast(`${product.name} +1`, { icon: '➕' });
+      } else if (quantity < product.quantity) {
+        toast(`${product.name} -1`, { icon: '➖' });
+      }
+
+      return prev.map(item =>
         item.id === productId ? { ...item, quantity } : item
-      )
-    );
+      );
+    });
   };
+  
 
   const clearCart = () => {
     setCartItems([]);
@@ -84,8 +111,18 @@ export const CartProvider = ({ children }) => {
   };
 
   const removeFromWishlist = (productId) => {
-    setWishlistItems(prev => prev.filter(item => item.id !== productId));
+    setWishlistItems(prev => {
+      const product = prev.find(item => item.id === productId);
+
+      if (product) {
+        toast.error(`${product.name} removed from your wishlist`);
+      }
+
+      return prev.filter(item => item.id !== productId);
+    });
   };
+
+
 
   const isInWishlist = (productId) => {
     return wishlistItems.some(item => item.id === productId);

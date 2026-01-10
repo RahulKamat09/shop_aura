@@ -13,8 +13,6 @@ const ProductCard = ({ product }) => {
     e.preventDefault();
     if (!product.inStock) return;
     addToCart(product);
-    toast.success(`${product.name} has been added to your cart.`)
-    // alert(`${product.name} has been added to your cart.`);
   };
 
   const handleWishlist = (e) => {
