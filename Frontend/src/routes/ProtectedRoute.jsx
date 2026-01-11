@@ -1,14 +1,20 @@
 import { Navigate, useLocation } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
+import api from "../api/api"; // ✅ adjust path if needed
+import toast from "react-hot-toast";
 
 const ProtectedRoute = ({ children }) => {
     const location = useLocation();
+
     const token = localStorage.getItem("token");
     const userId = localStorage.getItem("userId");
 
     const [isAllowed, setIsAllowed] = useState(null);
+    const hasShownToast = useRef(false); // ✅ prevent duplicate toasts
 
-    // 🔐 If not logged in
+    /* -----------------------------
+       🔐 NOT LOGGED IN → REDIRECT
+    ------------------------------ */
     if (!token || !userId) {
         return (
             <Navigate
@@ -19,32 +25,57 @@ const ProtectedRoute = ({ children }) => {
         );
     }
 
+    /* -----------------------------
+       🔍 CHECK USER STATUS
+    ------------------------------ */
     useEffect(() => {
-        fetch(`https://shop-aura.onrender.com/customers/${userId}`)
-            .then(res => res.json())
-            .then(user => {
-                if (user.status === "Active") {
+        const checkUserStatus = async () => {
+            try {
+                const { data: user } = await api.get(`/customers/${userId}`);
+
+                if (user?.status === "Active") {
                     setIsAllowed(true);
                 } else {
                     setIsAllowed(false);
                 }
-            })
-            .catch(() => setIsAllowed(false));
+            } catch (error) {
+                console.error("ProtectedRoute error:", error);
+                setIsAllowed(false);
+            }
+        };
+
+        checkUserStatus();
     }, [userId]);
 
-    // ⏳ While checking status
+    /* -----------------------------
+       ⏳ LOADING STATE
+    ------------------------------ */
     if (isAllowed === null) {
-        return <p style={{ padding: "2rem", textAlign: "center" }}>Checking access...</p>;
+        return (
+            <p style={{ padding: "2rem", textAlign: "center" }}>
+                Checking access...
+            </p>
+        );
     }
 
-    // ❌ Inactive user
+    /* -----------------------------
+       ❌ INACTIVE / BLOCKED USER
+    ------------------------------ */
     if (!isAllowed) {
-        alert("Your account is inactive. Please contact support.");
-        localStorage.clear();
+        if (!hasShownToast.current) {
+            toast.error("Your account is inactive. Please contact support.");
+            hasShownToast.current = true;
+        }
+
+        localStorage.removeItem("token");
+        localStorage.removeItem("userId");
+
         return <Navigate to="/" replace />;
     }
 
-    // ✅ Active user
+    /* -----------------------------
+       ✅ ACTIVE USER
+    ------------------------------ */
     return children;
 };
 

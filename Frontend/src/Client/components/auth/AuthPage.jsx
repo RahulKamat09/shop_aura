@@ -1,3 +1,5 @@
+import api from "../../../api/api";
+import toast from "react-hot-toast";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { Mail, Lock, User, Eye, EyeOff, ArrowRight, ArrowLeft, ShoppingBag, Sparkles, Phone } from "lucide-react";
@@ -31,125 +33,106 @@ const AuthPage = () => {
         e.preventDefault();
         setIsLoading(true);
 
-        if (!isLogin) {
-            // 🔍 Check for duplicate email or phone
-            const res = await fetch("https://shop-aura.onrender.com/customers");
-            const customers = await res.json();
+        try {
+            /* =============================
+               🆕 REGISTER FLOW
+            ============================== */
+            if (!isLogin) {
+                // Fetch all customers
+                const { data: customers } = await api.get("/customers");
 
-            const emailExists = customers.some(
-                (c) => c.email === formData.email
-            );
+                const emailExists = customers.some(
+                    (c) => c.email === formData.email
+                );
 
-            const phoneExists =
-                formData.phone &&
-                customers.some((c) => c.phone === formData.phone);
+                const phoneExists =
+                    formData.phone &&
+                    customers.some((c) => c.phone === formData.phone);
 
-            if (formData.password !== formData.confirmPassword) {
-                alert("Passwords do not match");
-                setIsLoading(false);
-                return;
+                if (formData.password !== formData.confirmPassword) {
+                    toast.error("Passwords do not match");
+                    return;
+                }
+
+                if (emailExists) {
+                    toast.error("This email is already registered");
+                    return;
+                }
+
+                if (phoneExists) {
+                    toast.error("This phone number is already registered");
+                    return;
+                }
+
+                const newCustomer = {
+                    id: "u_" + Date.now(),
+                    name: formData.name,
+                    email: formData.email,
+                    phone: formData.phone || "",
+                    password: formData.password,
+                    registered: new Date().toISOString().split("T")[0],
+                    status: "Active",
+                };
+
+                const { data: savedUser } = await api.post("/customers", newCustomer);
+
+                toast.success("Account created successfully 🎉");
+
+                localStorage.setItem("token", "user_logged_in");
+                localStorage.setItem("userId", savedUser.id);
             }
 
-            if (emailExists) {
-                alert("This email is already registered");
-                setIsLoading(false);
-                return;
+            /* =============================
+               🔐 LOGIN FLOW
+            ============================== */
+            else {
+                // ---------- ADMIN LOGIN ----------
+                const { data: admin } = await api.get("/admin");
+
+                if (
+                    formData.email === admin.email &&
+                    formData.password === admin.password
+                ) {
+                    toast.success("Admin login successful 🎉");
+                    localStorage.setItem("adminToken", "admin_logged_in");
+
+                    await delay(1000);
+                    navigate("/admin", { replace: true });
+                    return;
+                }
+
+                // ---------- USER LOGIN ----------
+                const { data: user } = await api.get(
+                    `/customers?email=${formData.email}&password=${formData.password}`
+                );
+
+                if (!user.length) {
+                    toast.error("Invalid email or password");
+                    return;
+                }
+
+                if (user[0].status !== "Active") {
+                    toast.error("Your account is inactive. Please contact support.");
+                    return;
+                }
+
+                localStorage.setItem("token", "user_logged_in");
+                localStorage.setItem("userId", user[0].id);
+
+                toast.success("Login successful 🎉");
             }
 
-            if (phoneExists) {
-                alert("This phone number is already registered");
-                setIsLoading(false);
-                return;
-            }
+            // UX delay (optional)
+            await delay(1000);
+            navigate(from, { replace: true });
 
-            // ✅ Create new customer
-            const newCustomer = {
-                id: "u_" + Date.now(),
-                name: formData.name,
-                email: formData.email,
-                phone: formData.phone || "",
-                password: formData.password,
-                registered: new Date().toISOString().split("T")[0],
-                status: "Active",
-            };
-
-            const createRes = await fetch("https://shop-aura.onrender.com/customers", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(newCustomer),
-            });
-
-            if (!createRes.ok) {
-                alert("Signup failed");
-                setIsLoading(false);
-                return;
-            }
-
-            const savedUser = await createRes.json();
-
-            localStorage.setItem("token", "user_logged_in");
-            localStorage.setItem("userId", savedUser.id);
-        } else {
-            // =========================
-            // 🔐 ADMIN LOGIN (FIRST)
-            // =========================
-            const adminRes = await fetch("https://shop-aura.onrender.com/admin");
-            const admin = await adminRes.json();
-
-            if (
-                formData.email === admin.email &&
-                formData.password === admin.password
-            ) {
-                localStorage.setItem("adminToken", "admin_logged_in");
-
-                await delay(2000 + Math.random() * 1000);
-                // ⏳ admin delay
-
-                setIsLoading(false);
-                navigate("/admin", { replace: true });
-                return;
-            }
-
-
-            // =========================
-            // 🔐 USER LOGIN
-            // =========================
-            const res = await fetch(
-                `https://shop-aura.onrender.com/customers?email=${formData.email}&password=${formData.password}`
-            );
-            const user = await res.json();
-
-            // ❌ Invalid credentials
-            if (!user.length) {
-                alert("Invalid email or password");
-                setIsLoading(false);
-                return;
-            }
-
-            // ❌ Inactive account check (IMPORTANT)
-            if (user[0].status !== "Active") {
-                alert("Your account is inactive. You can’t log in. Please contact support.");
-                setIsLoading(false);
-                return;
-            }
-
-            // ✅ Active user → allow login
-            localStorage.setItem("token", "user_logged_in");
-            localStorage.setItem("userId", user[0].id);
+        } catch (error) {
+            console.error("Auth error:", error);
+            toast.error("Something went wrong. Please try again.");
+        } finally {
+            setIsLoading(false);
         }
-
-        // ⏳ Artificial delay for better UX
-        await delay(2000 + Math.random() * 1000);
-        // 2000 = 2 seconds (use 3000 if you want)
-
-        // Stop loader
-        setIsLoading(false);
-
-        // Redirect
-        navigate(from, { replace: true });
-
     };
-
 
     const toggleMode = () => {
         setIsLogin(!isLogin);

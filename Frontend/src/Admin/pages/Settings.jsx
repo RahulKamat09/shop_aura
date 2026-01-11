@@ -1,3 +1,5 @@
+import api from "../../api/api";
+import toast from "react-hot-toast";
 import { useEffect, useState } from 'react';
 import { User, Store, Bell, Shield, CreditCard, HelpCircle } from 'lucide-react';
 
@@ -10,29 +12,40 @@ function Settings() {
   });
 
   useEffect(() => {
-    fetch("https://shop-aura.onrender.com/admin")
-      .then(res => res.json())
-      .then(data => {
+    const fetchAdmin = async () => {
+      try {
+        const { data } = await api.get("/admin");
+
         setAdmin({
           name: data.name,
           email: data.email,
           phone: data.phone
         });
-      });
+      } catch (error) {
+        console.error("Failed to load admin data", error);
+        toast.error("Failed to load admin profile");
+      }
+    };
+
+    fetchAdmin();
   }, []);
 
-  const handleAdminSave = async () => {
-    await fetch("https://shop-aura.onrender.com/admin", {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        ...admin
-        // password untouched
-      })
-    });
 
-    alert("Admin profile updated successfully");
+  const handleAdminSave = async () => {
+    try {
+      await api.patch("/admin", {
+        name: admin.name,
+        email: admin.email,
+        phone: admin.phone
+      });
+
+      toast.success("Admin profile updated successfully");
+    } catch (error) {
+      console.error("Failed to update admin profile", error);
+      toast.error("Failed to update profile");
+    }
   };
+
 
   const [settings, setSettings] = useState({
     storeName: 'ShopAura',

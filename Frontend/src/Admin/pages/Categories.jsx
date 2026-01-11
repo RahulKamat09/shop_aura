@@ -4,6 +4,8 @@ import { Plus, Search, Edit2, Trash2 } from 'lucide-react';
 import AModal from '../components/AModal';
 import Pagination from '../components/Pagination';
 import "../styles/admin.css"
+import toast from "react-hot-toast";
+
 
 const ITEMS_PER_PAGE = 4;
 
@@ -37,6 +39,7 @@ function Categories() {
       setCategories(res.data);
     } catch (error) {
       console.error("Failed to fetch categories", error);
+      toast.error('Failed to fetch categories!!');
     } finally {
       setLoading(false);
     }
@@ -53,9 +56,11 @@ function Categories() {
     try {
       setLoading(true);
       await api.post("/categories", category);
+      toast.success("Category added successfully");
       await fetchCategories();
     } catch (error) {
       console.error("Failed to add category", error);
+      toast.error("Failed to add category");
     } finally {
       setLoading(false);
     }
@@ -65,9 +70,11 @@ function Categories() {
     try {
       setLoading(true);
       await api.put(`/categories/${id}`, { ...updatedCategory, id });
+      toast.success("Category updated successfully");
       await fetchCategories();
     } catch (error) {
       console.error("Failed to update category", error);
+      toast.error("Failed to update category");
     } finally {
       setLoading(false);
     }
@@ -77,9 +84,15 @@ function Categories() {
     try {
       setLoading(true);
       await api.delete(`/categories/${id}`);
+      toast.success(
+        count > 0
+          ? "Category and related products deleted"
+          : "Category deleted successfully"
+      );
       await fetchCategories();
     } catch (error) {
       console.error("Failed to delete category", error);
+      toast.error("Failed to delete category");
     } finally {
       setLoading(false);
     }

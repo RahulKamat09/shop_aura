@@ -2,6 +2,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import Layout from '../components/layout/Layout';
 import { useCart } from '../context/CartContext';
 import { Heart, ShoppingCart, X, Eye } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 const Wishlist = () => {
   const { wishlistItems, removeFromWishlist, addToCart } = useCart();
@@ -9,8 +10,6 @@ const Wishlist = () => {
 
   const handleMoveToCart = (product) => {
     addToCart(product);
-    removeFromWishlist(product.id);
-    alert(`${product.name} moved to cart!`);
   };
 
   return (

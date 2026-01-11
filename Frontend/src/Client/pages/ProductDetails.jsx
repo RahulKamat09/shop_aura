@@ -1,3 +1,4 @@
+import api from "../../api/api";
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import Layout from '../components/layout/Layout';
@@ -22,32 +23,56 @@ const ProductDetails = () => {
 
   /* ---------------- FETCH PRODUCT BY ID ---------------- */
   useEffect(() => {
-    setLoading(true);
+    const fetchProduct = async () => {
+      try {
+        setLoading(true);
 
-    fetch(`https://shop-aura.onrender.com/products/${id}`)
-      .then(res => res.json())
-      .then(data => {
+        /* 1️⃣ Fetch main product */
+        const { data } = await api.get(`/products/${id}`);
+
+        if (!data || !data.id) {
+          toast.error("Product not found");
+          setLoading(false);
+          return;
+        }
+
         setProduct(data);
         setSelectedImage(data.image);
-        setLoading(false);
 
-        // Fetch related products
-        fetch(
-          `https://shop-aura.onrender.com/products?category=${data.category}&id_ne=${data.id}&_limit=4`
-        )
-          .then(res => res.json())
-          .then(related => setRelatedProducts(related));
-      })
-      .catch(err => {
-        console.error("Failed to fetch product:", err);
+        /* 2️⃣ Fetch related products */
+        const { data: related } = await api.get(
+          `/products?category=${data.category}&id_ne=${data.id}&_limit=4`
+        );
+
+        setRelatedProducts(related || []);
+
+      } catch (error) {
+        console.error("Failed to fetch product:", error);
+        toast.error("Failed to load product details");
+      } finally {
         setLoading(false);
-      });
+      }
+    };
+
+    fetchProduct();
   }, [id]);
 
+
   const handleAddToCart = () => {
-    addToCart(product); // ensures product exists in cart
-    updateQuantity(product.id, quantity);
+    if (!product) return;
+
+    if (cartItem) {
+      // Product already in cart → just update quantity
+      updateQuantity(product.id, quantity);
+      toast.success("Cart updated");
+    } else {
+      // First time add
+      addToCart(product);
+      updateQuantity(product.id, quantity);
+    }
   };
+
+
 
   const handleWishlist = () => {
     if (isInWishlist(product.id)) {

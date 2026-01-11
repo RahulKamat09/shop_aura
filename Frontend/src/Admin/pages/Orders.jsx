@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { Search, Eye, Package, Calendar, User, Mail, MapPin, CreditCard } from 'lucide-react';
 import AModal from '../components/AModal';
 import Pagination from '../components/Pagination';
+import toast from "react-hot-toast";
 
 const ITEMS_PER_PAGE = 5;
 
@@ -29,6 +30,7 @@ function Orders() {
         setProducts(productsRes.data || []);
       } catch (error) {
         console.error("Failed to load data", error);
+        toast.error('Failed to Load Data!')
       } finally {
         setLoading(false);
       }

@@ -1,3 +1,5 @@
+import api from "../../api/api";
+import toast from "react-hot-toast";
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import Layout from "../components/layout/Layout";
@@ -9,11 +11,25 @@ const OrderProductPage = () => {
     const [order, setOrder] = useState(null);
 
     useEffect(() => {
-        fetch(`https://shop-aura.onrender.com/orders/${orderId}`)
-            .then(res => res.json())
-            .then(data => setOrder(data))
-            .catch(err => console.error(err));
+        const fetchOrder = async () => {
+            try {
+                const { data } = await api.get(`/orders/${orderId}`);
+
+                if (!data || !data.id) {
+                    toast.error("Order not found");
+                    return;
+                }
+
+                setOrder(data);
+            } catch (error) {
+                console.error("Failed to fetch order", error);
+                toast.error("Failed to load order details");
+            }
+        };
+
+        fetchOrder();
     }, [orderId]);
+
 
     if (!order) {
         return <p style={{ padding: "2rem" }}>Loading order details...</p>;

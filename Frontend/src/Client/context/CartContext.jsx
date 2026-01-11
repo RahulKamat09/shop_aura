@@ -61,28 +61,20 @@ export const CartProvider = ({ children }) => {
 
 
   const updateQuantity = (productId, quantity) => {
-    if (quantity <= 0) {
-      removeFromCart(productId);
-      return;
-    }
+  if (quantity <= 0) {
+    removeFromCart(productId);
+    return;
+  }
 
-    setCartItems(prev => {
-      const product = prev.find(item => item.id === productId);
+  setCartItems(prev =>
+    prev.map(item =>
+      item.id === productId
+        ? { ...item, quantity }
+        : item
+    )
+  );
+};
 
-      if (!product) return prev;
-
-      // 🔔 Simple toast based on action
-      if (quantity > product.quantity) {
-        toast(`${product.name} +1`, { icon: '➕' });
-      } else if (quantity < product.quantity) {
-        toast(`${product.name} -1`, { icon: '➖' });
-      }
-
-      return prev.map(item =>
-        item.id === productId ? { ...item, quantity } : item
-      );
-    });
-  };
   
 
   const clearCart = () => {

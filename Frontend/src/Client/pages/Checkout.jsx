@@ -1,3 +1,5 @@
+import api from "../../api/api";
+import toast from "react-hot-toast";
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Layout from '../components/layout/Layout';
@@ -16,18 +18,24 @@ const Checkout = () => {
 
   /* ---------------- PLACE ORDER ---------------- */
   const placeOrder = async () => {
-    if (!userId || cartItems.length === 0) return;
+    if (!userId || cartItems.length === 0) {
+      toast.error("Cart is empty or user not logged in");
+      return;
+    }
 
     try {
-      // 1️⃣ Fetch user
-      const userRes = await fetch(`https://shop-aura.onrender.com/customers/${userId}`);
-      const user = await userRes.json();
+      setIsProcessing(true);
+
+      /* 1️⃣ Fetch user */
+      const { data: user } = await api.get(`/customers/${userId}`);
 
       if (user?.status !== "Active") {
-        alert("Your account is inactive. You cannot place orders.");
+        toast.error("Your account is inactive. You cannot place orders.");
+        setIsProcessing(false);
         return;
       }
 
+      /* 2️⃣ Create order object */
       const newOrder = {
         id: "ORD_" + Date.now(),
         userId,
@@ -68,27 +76,63 @@ const Checkout = () => {
         date: new Date().toISOString().split("T")[0]
       };
 
-      // 3️⃣ Save order
-      await fetch("https://shop-aura.onrender.com/orders", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(newOrder)
+      /* 3️⃣ Save order */
+      await api.post("/orders", newOrder);
+
+      /* 4️⃣ Update customer stats (PATCH = safe) */
+      await api.patch(`/customers/${userId}`, {
+        orders: (user.orders || 0) + 1,
+        totalSpent: (user.totalSpent || 0) + newOrder.total
       });
 
-      // 4️⃣ Update customer stats
-      await fetch(`https://shop-aura.onrender.com/customers/${userId}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          orders: (user.orders || 0) + 1,
-          totalSpent: (user.totalSpent || 0) + newOrder.total
-        })
-      });
+      /* 5️⃣ Success feedback */
+      toast.success("Order placed successfully 🎉");
 
+      clearCart();
+      setOrderSuccess(true);
 
     } catch (error) {
       console.error("Order placement failed:", error);
+      toast.error("Failed to place order. Please try again.");
+    } finally {
+      setIsProcessing(false);
     }
+  };
+
+  const validateCheckout = () => {
+    const requiredFields = [
+      "firstName",
+      "lastName",
+      "email",
+      "phone",
+      "address",
+      "city",
+      "state",
+      "zip",
+      "country"
+    ];
+
+    for (const field of requiredFields) {
+      if (!formData[field]) {
+        toast.error("Please fill all shipping details");
+        return false;
+      }
+    }
+
+    // Payment-specific validation
+    if (paymentMethod === "card") {
+      if (!formData.cardNumber || !formData.cardName || !formData.expiry || !formData.cvv) {
+        toast.error("Please fill all card details");
+        return false;
+      }
+    }
+
+    if (paymentMethod === "upi" && !formData.upiId) {
+      toast.error("Please enter UPI ID");
+      return false;
+    }
+
+    return true;
   };
 
   /* ---------------- FORM STATE ---------------- */
@@ -117,14 +161,11 @@ const Checkout = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    setIsProcessing(true);
-
-    setTimeout(() => {
-      clearCart();
-      setIsProcessing(false);
-      setOrderSuccess(true);
-    }, 2000);
+    if (!validateCheckout()) return;
+    placeOrder();
   };
+
+
 
   if (cartItems.length === 0 && !orderSuccess) {
     return (
@@ -393,7 +434,6 @@ const Checkout = () => {
                       className="btn-primary"
                       style={{ width: '100%', justifyContent: 'center', marginTop: '1rem' }}
                       disabled={isProcessing}
-                      onClick={placeOrder}
                     >
                       {isProcessing ? 'Processing...' : 'Place Order'}
                       {!isProcessing && <Check size={18} />}

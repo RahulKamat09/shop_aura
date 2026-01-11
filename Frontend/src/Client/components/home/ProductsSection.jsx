@@ -1,6 +1,7 @@
 import api from "../../../api/api";
 import { useEffect, useState } from "react";
 import ProductCard from "../ProductCard";
+import toast from "react-hot-toast";
 
 const tabs = ["All", "Clothing", "Accessories", "Electronics"];
 
@@ -25,6 +26,7 @@ const ProductsSection = () => {
         setProducts(res.data.slice(0, 12));
       } catch (error) {
         console.error("Failed to fetch products:", error);
+        toast.error('Failed to fetch products!')
       } finally {
         setLoading(false);
       }

@@ -4,6 +4,7 @@ import Layout from '../components/layout/Layout';
 import ProductCard from '../components/ProductCard';
 import { Link, useLocation } from 'react-router-dom';
 import { Grid, List, House, Filter, X } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 /* ===============================
    CONSTANTS
@@ -44,6 +45,7 @@ const Category = () => {
       } catch (err) {
         console.error(err);
         setError('Failed to fetch categories');
+        toast.error('Failed to fetch categories!')
       }
     };
 
@@ -63,6 +65,7 @@ const Category = () => {
       } catch (err) {
         console.error(err);
         setError('Failed to fetch products');
+        toast.error('Failed to fetch products!!')
       } finally {
         setLoading(false);
       }

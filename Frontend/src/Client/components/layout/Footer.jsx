@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Facebook, Twitter, Instagram, Linkedin, Youtube, Mail, Phone, MapPin, Send, CreditCard, Truck, ShieldCheck, Headphones } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 const Footer = () => {
   const [email, setEmail] = useState('');
@@ -8,7 +9,7 @@ const Footer = () => {
   const handleSubscribe = (e) => {
     e.preventDefault();
     if (email) {
-      alert('Thank you for subscribing to our newsletter!');
+      toast.success('Thank you for subscribing to our newsletter!');
       setEmail('');
     }
   };

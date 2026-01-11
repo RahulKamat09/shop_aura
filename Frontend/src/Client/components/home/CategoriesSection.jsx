@@ -1,5 +1,6 @@
 import api from "../../../api/api";
 import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
 import { Link } from "react-router-dom";
 
 const CategoriesSection = () => {
@@ -15,6 +16,7 @@ const CategoriesSection = () => {
         setCategories(res.data);
       } catch (error) {
         console.error("Failed to fetch categories:", error);
+        toast.error('Failed to fetch categories!');
       } finally {
         setLoading(false);
       }

@@ -1,8 +1,10 @@
+import api from "../../api/api";
+import toast from "react-hot-toast";
 import { useState, useEffect } from 'react';
 import Layout from '../components/layout/Layout';
 import { useCart } from '../context/CartContext';
 import { User, Package, Heart, MapPin, Settings, LogOut, Camera } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const Profile = () => {
   const [orders, setOrders] = useState([]);
@@ -11,24 +13,34 @@ const Profile = () => {
   const [profile, setProfile] = useState(null);
 
   const userId = localStorage.getItem("userId");
+  const navigate = useNavigate();
 
   /* ---------------- FETCH ORDERS ---------------- */
   useEffect(() => {
     if (!userId) return;
 
-    fetch(`https://shop-aura.onrender.com/orders?userId=${userId}`)
-      .then(res => res.json())
-      .then(data => setOrders(data || []))
-      .catch(err => console.error("Order fetch error:", err));
+    const fetchOrders = async () => {
+      try {
+        const { data } = await api.get(`/orders?userId=${userId}`);
+        setOrders(data || []);
+      } catch (error) {
+        console.error("Order fetch error:", error);
+        toast.error("Failed to load order history");
+      }
+    };
+
+    fetchOrders();
   }, [userId]);
+
 
   /* ---------------- FETCH PROFILE ---------------- */
   useEffect(() => {
     if (!userId) return;
 
-    fetch(`https://shop-aura.onrender.com/customers/${userId}`)
-      .then(res => res.json())
-      .then(data => {
+    const fetchProfile = async () => {
+      try {
+        const { data } = await api.get(`/customers/${userId}`);
+
         const name = data?.name || "";
         const [firstName, lastName = ""] = name.split(" ");
 
@@ -41,9 +53,15 @@ const Profile = () => {
             data?.avatar ||
             "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150"
         });
-      })
-      .catch(err => console.error("Profile fetch error:", err));
+      } catch (error) {
+        console.error("Profile fetch error:", error);
+        toast.error("Failed to load profile data");
+      }
+    };
+
+    fetchProfile();
   }, [userId]);
+
 
   if (!profile) {
     return <p style={{ padding: "2rem" }}>Loading profile...</p>;
@@ -79,10 +97,31 @@ const Profile = () => {
     { id: 'settings', label: 'Settings', icon: Settings },
   ];
 
-  const handleProfileUpdate = (e) => {
+  const handleProfileUpdate = async (e) => {
     e.preventDefault();
-    alert('Profile updated successfully!');
+
+    try {
+      await api.patch(`/customers/${userId}`, {
+        name: `${profile.firstName} ${profile.lastName}`.trim(),
+        email: profile.email,
+        phone: profile.phone
+      });
+
+      toast.success("Profile updated successfully");
+    } catch (error) {
+      console.error("Profile update failed:", error);
+      toast.error("Failed to update profile");
+    }
   };
+
+  const handleLogout = () => {
+    if (!window.confirm("Are you sure you want to logout?")) return;
+    localStorage.removeItem("token");
+    localStorage.removeItem("userId");
+    toast.success('Logged out successfully!! 🎉');
+    navigate("/", { replace: true });
+  }
+
 
   return (
     <Layout>
@@ -145,13 +184,7 @@ const Profile = () => {
                 <button
                   className="profile-tab"
                   style={{ color: 'var(--destructive)' }}
-                  onClick={() => {
-                    if (!window.confirm("Are you sure you want to logout?")) return;
-                    localStorage.removeItem("token");
-                    localStorage.removeItem("userId");
-                    window.location.href = "/";
-
-                  }}
+                  onClick={handleLogout}
                 >
                   <LogOut size={18} />
                   Logout

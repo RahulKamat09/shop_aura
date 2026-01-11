@@ -1,6 +1,7 @@
 import api from "../../../api/api";
 import { useEffect, useState } from "react";
 import ProductCard from "../ProductCard";
+import toast from "react-hot-toast";
 
 const BestSellersSection = () => {
   const [bestSellers, setBestSellers] = useState([]);
@@ -20,6 +21,7 @@ const BestSellersSection = () => {
         setBestSellers(res.data);
       } catch (error) {
         console.error("Failed to fetch best sellers:", error);
+        toast.error('Failed to fetch best sellers!')
       } finally {
         setLoading(false);
       }
