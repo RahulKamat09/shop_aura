@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { Search, Trash2, Circle, CheckCircle, CornerUpLeft, Eye, Send, Mail, User, Calendar } from 'lucide-react';
 import AModal from '../components/AModal';
 import Pagination from '../components/Pagination';
+import api from '../../api/api';
+import toast from 'react-hot-toast';
 
 const ITEMS_PER_PAGE = 4;
 
@@ -17,20 +19,24 @@ function Messages() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('https://shop-aura.onrender.com/messages')
-      .then(res => res.json())
-      .then(data => {
-        // ⏳ 1 second delay
+    const fetchMessages = async () => {
+      try {
+        const { data } = await api.get('/messages');
+
         setTimeout(() => {
           setMessages(data);
           setLoading(false);
         }, 500);
-      })
-      .catch(err => {
-        console.error(err);
+      } catch (error) {
+        console.error(error);
+        toast.error('Failed to load messages');
         setLoading(false);
-      });
+      }
+    };
+
+    fetchMessages();
   }, []);
+
 
 
   if (!messages.length) {
@@ -41,14 +47,34 @@ function Messages() {
     );
   }
 
-  // CRUD Operations
-  const deleteMessage = (id) => {
-    setMessages(messages.filter(m => m.id !== id));
+  //CRUD Operation
+  const deleteMessage = async (id) => {
+    if (!window.confirm('Are you sure?')) return;
+
+    try {
+      await api.delete(`/messages/${id}`);
+      setMessages(prev => prev.filter(m => m.id !== id));
+      toast.success('Message deleted');
+    } catch (error) {
+      console.error(error);
+      toast.error('Failed to delete message');
+    }
   };
 
-  const updateMessageStatus = (id, status) => {
-    setMessages(messages.map(m => m.id === id ? { ...m, status } : m));
+  const updateMessageStatus = async (id, status) => {
+    try {
+      await api.patch(`/messages/${id}`, { status });
+
+      setMessages(prev =>
+        prev.map(m => (m.id === id ? { ...m, status } : m))
+      );
+    } catch (error) {
+      console.error(error);
+      toast.error('Failed to update status');
+    }
   };
+
+
 
   const unreadMessages = messages.filter(m => m.status === 'unread').length;
 
@@ -112,7 +138,7 @@ function Messages() {
   const handleSendReply = () => {
     if (replyText.trim() && viewingMessage) {
       updateMessageStatus(viewingMessage.id, 'replied');
-      alert('Reply sent successfully!');
+      toast.success('Reply Sent Successfully!!')
       handleCloseReplyModal();
     }
   };

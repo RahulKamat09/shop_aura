@@ -1,3 +1,5 @@
+import api from "../../api/api";
+import toast from "react-hot-toast";
 import { useState, useEffect } from 'react';
 import { Menu, Search, Bell, Settings, User, ChevronDown } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -14,19 +16,24 @@ function AHeader({ onToggleSidebar, sidebarOpen, onNavigate }) {
   useEffect(() => {
     if (adminToken !== "admin_logged_in") return;
 
-    fetch("https://shop-aura.onrender.com/admin")
-      .then(res => res.json())
-      .then(data => {
+    const fetchAdmin = async () => {
+      try {
+        const { data } = await api.get("/admin");
+
         setAdmin({
           name: data.name,
           email: data.email,
           avatar: data.avatar || null,
         });
-      })
-      .catch(err => {
-        console.error("Admin fetch failed:", err);
-      });
+      } catch (error) {
+        console.error("Admin fetch failed:", error);
+        toast.error("Failed to load admin profile");
+      }
+    };
+
+    fetchAdmin();
   }, [adminToken]);
+
 
 
   const getInitials = (name = "") =>
@@ -40,13 +47,15 @@ function AHeader({ onToggleSidebar, sidebarOpen, onNavigate }) {
 
   const handleLogout = () => {
     if (!window.confirm("Are you sure you want to logout?")) return;
-    // Clear admin & user session safely
+
     localStorage.removeItem("adminToken");
     localStorage.removeItem("token");
     localStorage.removeItem("userId");
-    // Redirect to auth page
+
+    toast.success("Logged out successfully");
     navigate("/auth", { replace: true });
   };
+
 
   const notifications = [
     { id: 1, title: 'New order received', time: '2 min ago', unread: true },

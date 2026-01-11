@@ -1,3 +1,5 @@
+import api from '../../api/api';
+import toast from 'react-hot-toast';
 import { useEffect, useState } from 'react';
 import {
   DollarSign,
@@ -19,25 +21,31 @@ function Dashboard({ onNavigate }) {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [productsRes, ordersRes, messagesRes, customersRes] =
-          await Promise.all([
-            fetch('https://shop-aura.onrender.com/products'),
-            fetch('https://shop-aura.onrender.com/orders'),
-            fetch('https://shop-aura.onrender.com/messages'),
-            fetch('https://shop-aura.onrender.com/customers'),
-          ]);
+        const [
+          productsRes,
+          ordersRes,
+          messagesRes,
+          customersRes,
+        ] = await Promise.all([
+          api.get('/products'),
+          api.get('/orders'),
+          api.get('/messages'),
+          api.get('/customers'),
+        ]);
 
-        setProducts(await productsRes.json());
-        setOrders(await ordersRes.json());
-        setMessages(await messagesRes.json());
-        setCustomers(await customersRes.json());
+        setProducts(productsRes.data);
+        setOrders(ordersRes.data);
+        setMessages(messagesRes.data);
+        setCustomers(customersRes.data);
       } catch (error) {
         console.error('Dashboard fetch error:', error);
+        toast.error('Failed to load dashboard data');
       }
     };
 
     fetchData();
   }, []);
+
 
   /* ---------------- CALCULATIONS ---------------- */
   const totalRevenue = orders.reduce(
@@ -53,8 +61,8 @@ function Dashboard({ onNavigate }) {
     m => m?.status === 'unread'
   ).length;
 
-  const recentOrders = orders.slice(0, 5);
-  const recentMessages = messages.slice(0, 3);
+  const recentOrders = [...orders].reverse().slice(0, 5);
+  const recentMessages = [...messages].reverse().slice(0, 3);
   const topProducts = products.slice(0, 3);
 
   const getStatusClass = (status = '') => {

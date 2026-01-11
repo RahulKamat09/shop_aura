@@ -2,6 +2,9 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import Layout from '../components/layout/Layout';
 import { MapPin, Phone, Mail, Clock, Send } from 'lucide-react';
+import toast from 'react-hot-toast';
+import api from '../../api/api';
+
 
 const Contact = () => {
   const [formData, setFormData] = useState({
@@ -11,11 +14,30 @@ const Contact = () => {
     message: '',
   });
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    alert('Thank you for contacting us. We\'ll get back to you soon.');
-    setFormData({ name: '', email: '', subject: '', message: '' });
+
+    const newMessage = {
+      sender: formData.name,
+      subject: formData.subject,
+      message: formData.message,
+      date: new Date().toISOString().split('T')[0], // YYYY-MM-DD
+      status: 'unread',
+    };
+
+    try {
+      await api.post('/messages', newMessage);
+
+      toast.success('Thank you for contacting us. We will get back to you soon.');
+      setFormData({ name: '', email: '', subject: '', message: '' });
+
+    } catch (error) {
+      console.error(error);
+      toast.error('Something went wrong. Please try again.');
+    }
   };
+
+
 
   const contactInfo = [
     { icon: MapPin, title: 'Our Address', content: '123 Fashion Street, New York, NY 10001' },
@@ -79,42 +101,42 @@ const Contact = () => {
               <div className="form-grid form-grid-2">
                 <div className="form-group">
                   <label className="form-label">Your Name</label>
-                  <input 
-                    type="text" 
-                    className="input-field" 
+                  <input
+                    type="text"
+                    className="input-field"
                     value={formData.name}
-                    onChange={(e) => setFormData({...formData, name: e.target.value})}
-                    required 
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    required
                   />
                 </div>
                 <div className="form-group">
                   <label className="form-label">Your Email</label>
-                  <input 
-                    type="email" 
-                    className="input-field" 
+                  <input
+                    type="email"
+                    className="input-field"
                     value={formData.email}
-                    onChange={(e) => setFormData({...formData, email: e.target.value})}
-                    required 
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    required
                   />
                 </div>
               </div>
               <div className="form-group">
                 <label className="form-label">Subject</label>
-                <input 
-                  type="text" 
-                  className="input-field" 
+                <input
+                  type="text"
+                  className="input-field"
                   value={formData.subject}
-                  onChange={(e) => setFormData({...formData, subject: e.target.value})}
-                  required 
+                  onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
+                  required
                 />
               </div>
               <div className="form-group">
                 <label className="form-label">Message</label>
-                <textarea 
-                  className="input-field" 
+                <textarea
+                  className="input-field"
                   rows="5"
                   value={formData.message}
-                  onChange={(e) => setFormData({...formData, message: e.target.value})}
+                  onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                   required
                   style={{ resize: 'vertical' }}
                 ></textarea>

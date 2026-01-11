@@ -1,4 +1,5 @@
 import api from '../../api/api';
+import toast from 'react-hot-toast';
 import { useEffect, useState } from 'react';
 import { Plus, Search, Eye, Edit2, Trash2, Package, Tag, DollarSign, FileText } from 'lucide-react';
 import AModal from '../components/AModal';
@@ -51,6 +52,7 @@ function Products() {
       setCategories(categoriesRes.data.map(c => c.name));
     } catch (error) {
       console.error('Failed to fetch data', error);
+      toast.error('Failed To load data!!!');
     } finally {
       setLoading(false);
     }
@@ -60,6 +62,7 @@ function Products() {
   const addProduct = async (product) => {
     try {
       await api.post("/products", product);
+      toast.success("Product added successfully");
 
       // find category
       const categoryRes = await api.get(
@@ -77,6 +80,7 @@ function Products() {
       fetchInitialData();
     } catch (error) {
       console.error("Failed to add product", error);
+      toast.error('Failed to add product');
     }
   };
 
@@ -85,9 +89,11 @@ function Products() {
   const updateProduct = async (id, updatedProduct) => {
     try {
       await api.put(`/products/${id}`, updatedProduct);
+      toast.success("Product updated successfully");
       fetchInitialData();
     } catch (error) {
       console.error('Failed to update product', error);
+      toast.error('Failed to update product');
     }
   };
 
@@ -96,9 +102,11 @@ function Products() {
   const deleteProduct = async (id) => {
     try {
       await api.delete(`/products/${id}`);
+      toast.success("Product deleted successfully");
       fetchInitialData(); // 🔥 refetch products
     } catch (error) {
       console.error('Failed to delete product', error);
+      toast.error('Failed to delete product');
     }
   };
 

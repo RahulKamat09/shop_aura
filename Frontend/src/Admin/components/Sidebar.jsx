@@ -1,3 +1,5 @@
+import api from "../../api/api";
+import toast from 'react-hot-toast';
 import { Store, LayoutDashboard, Package, FolderOpen, ShoppingCart, Users, MessageSquare, Settings, ChevronLeft, LogOut, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
@@ -21,19 +23,24 @@ function Sidebar({ currentPage, onNavigate, sidebarCollapsed, setSidebarCollapse
   useEffect(() => {
     if (adminToken !== "admin_logged_in") return;
 
-    fetch("https://shop-aura.onrender.com/admin")
-      .then(res => res.json())
-      .then(data => {
+    const fetchAdmin = async () => {
+      try {
+        const { data } = await api.get("/admin");
+
         setAdmin({
           name: data.name,
           email: data.email,
           avatar: data.avatar || null,
         });
-      })
-      .catch(err => {
-        console.error("Sidebar admin fetch failed:", err);
-      });
+      } catch (error) {
+        console.error("Sidebar admin fetch failed:", error);
+        toast.error('Failed To load Sidebar')
+      }
+    };
+
+    fetchAdmin();
   }, [adminToken]);
+
 
 
   const getInitials = (name = "") =>
@@ -53,6 +60,7 @@ function Sidebar({ currentPage, onNavigate, sidebarCollapsed, setSidebarCollapse
     localStorage.removeItem("token");
     localStorage.removeItem("userId");
     // Redirect to auth page
+    toast.success('Logged Out Successfully!')
     navigate("/auth", { replace: true });
   };
 

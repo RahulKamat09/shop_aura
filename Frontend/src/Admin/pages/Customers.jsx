@@ -1,3 +1,5 @@
+import api from "../../api/api";
+import toast from "react-hot-toast";
 import { useEffect, useState } from "react";
 import {
   Search,
@@ -39,17 +41,15 @@ function Customers() {
   const fetchData = async () => {
     try {
       const [customersRes, ordersRes] = await Promise.all([
-        fetch("https://shop-aura.onrender.com/customers"),
-        fetch("https://shop-aura.onrender.com/orders"),
+        api.get("/customers"),
+        api.get("/orders"),
       ]);
 
-      const customersData = await customersRes.json();
-      const ordersData = await ordersRes.json();
-
-      setCustomers(customersData);
-      setOrders(ordersData);
+      setCustomers(customersRes.data);
+      setOrders(ordersRes.data);
     } catch (error) {
       console.error("Failed to fetch customers/orders", error);
+      toast.error("Failed to load customers data");
     }
   };
 
@@ -110,19 +110,19 @@ function Customers() {
 
   const updateStatus = async (id, status) => {
     try {
-      await fetch(`https://shop-aura.onrender.com/customers/${id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status }),
-      });
+      await api.patch(`/customers/${id}`, { status });
 
       setCustomers((prev) =>
         prev.map((c) => (c.id === id ? { ...c, status } : c))
       );
+
+      toast.success(`Customer ${status}`);
     } catch (error) {
       console.error("Failed to update status", error);
+      toast.error("Failed to update customer status");
     }
   };
+
 
   const deleteCustomer = async (id) => {
     const confirmDelete = window.confirm(
@@ -131,13 +131,12 @@ function Customers() {
     if (!confirmDelete) return;
 
     try {
-      await fetch(`https://shop-aura.onrender.com/customers/${id}`, {
-        method: "DELETE",
-      });
-
+      await api.delete(`/customers/${id}`);
       setCustomers((prev) => prev.filter((c) => c.id !== id));
+      toast.success("Customer deleted");
     } catch (error) {
       console.error("Failed to delete customer", error);
+      toast.error("Failed to delete customer");
     }
   };
 

@@ -37,6 +37,11 @@ function Orders() {
     loadData();
   }, []);
 
+  const sortedOrders = [...orders].sort(
+    (a, b) => new Date(b.date) - new Date(a.date)
+  );
+
+
   /* ---------------- FILTERS ---------------- */
   const filters = [
     { id: 'all', label: 'All', count: orders.length },
@@ -46,7 +51,7 @@ function Orders() {
     { id: 'cancelled', label: 'Cancelled', count: orders.filter(o => o.status === 'Cancelled').length }
   ];
 
-  const filteredOrders = orders.filter(order => {
+  const filteredOrders = sortedOrders.filter(order => {
     const search = searchTerm.toLowerCase();
 
     const matchesSearch =
