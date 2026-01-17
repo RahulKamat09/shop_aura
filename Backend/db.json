@@ -1207,17 +1207,6 @@
       "orders": 3,
       "totalSpent": 572.95,
       "status": "Active"
-    },
-    {
-      "id": "u_1768124381331",
-      "name": "Tushar Solanki ",
-      "email": "tushar23@gmail.com",
-      "phone": "7878787878",
-      "password": "Tushar3434",
-      "registered": "2026-01-11",
-      "status": "Active",
-      "orders": 1,
-      "totalSpent": 351.96
     }
   ],
   "admin": {
@@ -1258,6 +1247,38 @@
       "message": "Do you ship internationally?",
       "date": "2024-12-09",
       "status": "unread"
+    }
+  ],
+  "banners": [
+    {
+      "title": "New Season Arrivals",
+      "subtitle": "Up to 40% Off",
+      "description": "On Trendy Clothing",
+      "image": "https://d1csarkz8obe9u.cloudfront.net/posterpreviews/summer-fashion-sale-banner-design-template-62077c541db2b288dbccd6d9d1c9af3d_screen.jpg?ts=1649932911",
+      "page": "home",
+      "category": "",
+      "active": true,
+      "id": 1
+    },
+    {
+      "title": "sfugeuigh",
+      "subtitle": "shoigwau",
+      "description": "EHFUWEH",
+      "image": "UEFHIUWEFH",
+      "page": "home",
+      "category": "",
+      "active": true,
+      "id": 2
+    },
+    {
+      "title": "New Arriva;",
+      "subtitle": "Get Upto 30% off",
+      "description": "Republic Day Sale",
+      "image": "https://marketplace.canva.com/EAG20zmI0Aw/1/0/1600w/canva-brown-and-beige-modern-new-product-sale-banner-landscape--U8HqZtV1w8.jpg",
+      "page": "home",
+      "category": "",
+      "active": true,
+      "id": 3
     }
   ]
 }

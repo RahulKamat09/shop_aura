@@ -8,7 +8,6 @@ import Orders from './pages/Orders';
 import Customers from './pages/Customers';
 import Messages from './pages/Messages';
 import Settings from './pages/Settings';
-import Banner from './pages/Banner';
 import '../Admin/styles/admin.css';
 
 function AdminApp() {
@@ -42,8 +41,6 @@ function AdminApp() {
         return <Categories />;
       case 'orders':
         return <Orders />;
-      case 'banners':                
-        return <Banner />;
       case 'customers':
         return <Customers />;
       case 'messages':
@@ -59,23 +56,23 @@ function AdminApp() {
     <div className="admin-layout">
       {/* Overlay for mobile sidebar */}
       {mobileSidebarOpen && (
-        <div
-          className="sidebar-overlay"
+        <div 
+          className="sidebar-overlay" 
           onClick={() => setMobileSidebarOpen(false)}
         />
       )}
-
-      <Sidebar
-        currentPage={currentPage}
-        onNavigate={handleNavigate}
+      
+      <Sidebar 
+        currentPage={currentPage} 
+        onNavigate={handleNavigate} 
         sidebarCollapsed={sidebarCollapsed}
         setSidebarCollapsed={setSidebarCollapsed}
         mobileSidebarOpen={mobileSidebarOpen}
       />
-
+      
       <div className={`admin-main-wrapper ${sidebarCollapsed ? 'collapsed' : ''}`}>
-        <AHeader
-          onToggleSidebar={handleToggleSidebar}
+        <AHeader 
+          onToggleSidebar={handleToggleSidebar} 
           sidebarOpen={!sidebarCollapsed}
           onNavigate={handleNavigate}
         />
