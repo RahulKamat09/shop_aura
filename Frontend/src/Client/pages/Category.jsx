@@ -5,6 +5,8 @@ import ProductCard from '../components/ProductCard';
 import { Link, useLocation } from 'react-router-dom';
 import { Grid, List, House, Filter, X } from 'lucide-react';
 import toast from 'react-hot-toast';
+import ProductCardSkeleton from '../components/Skeletons/ProductCardSkeleton';
+import CategoryCardSkeleton from '../components/Skeletons/CategoryCardSkeleton';
 
 /* ===============================
    CONSTANTS
@@ -30,7 +32,8 @@ const Category = () => {
   ================================ */
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true);          // API loading
+  const [productLoading, setProductLoading] = useState(false); // UI transition loading
   const [error, setError] = useState(null);
 
   /* ===============================
@@ -92,6 +95,18 @@ const Category = () => {
   useEffect(() => {
     setCurrentPage(1);
   }, [selectedCategory, sortBy, gender]);
+
+  useEffect(() => {
+    if (!showCategories) {
+      setProductLoading(true);
+      const timer = setTimeout(() => {
+        setProductLoading(false);
+      }, 500);
+
+      return () => clearTimeout(timer);
+    }
+  }, [selectedCategory, sortBy, gender, currentPage]);
+
 
   /* ===============================
      FILTER PRODUCTS
@@ -193,8 +208,13 @@ const Category = () => {
               name="category"
               checked={selectedCategory === cat.name}
               onChange={() => {
+                setProductLoading(true);
                 setSelectedCategory(cat.name);
                 setShowCategories(false);
+
+                setTimeout(() => {
+                  setProductLoading(false);
+                }, 600); // smooth UX (Amazon-style)
               }}
             />
             <span>{cat.name}</span>
@@ -243,7 +263,7 @@ const Category = () => {
             <Link to="/">Home</Link>
             <span>/</span>
             {showCategories ? (
-              <span>Shop</span>
+              <span>Category</span>
             ) : (
               <>
                 <span
@@ -253,7 +273,7 @@ const Category = () => {
                     setSelectedCategory('All');
                   }}
                 >
-                  Shop
+                  Categories
                 </span>
                 <span>/</span>
                 <span>{selectedCategory}</span>
@@ -277,11 +297,14 @@ const Category = () => {
         </div>
 
         {/* Loading State */}
-        {loading && (
-          <div style={{ textAlign: 'center', padding: '3rem 0' }}>
-            <p>Loading products...</p>
+        {loading && showCategories && (
+          <div className="grid-4">
+            {[...Array(8)].map((_, i) => (
+              <CategoryCardSkeleton key={i} />
+            ))}
           </div>
         )}
+
 
         {/* Category Cards - Initial View */}
         {!loading && showCategories && (
@@ -295,9 +318,15 @@ const Category = () => {
                   className="category-item animate-fade-in"
                   style={{ animationDelay: `${index * 0.05}s` }}
                   onClick={() => {
+                    setProductLoading(true);   // 👈 trigger skeleton
                     setSelectedCategory(cat.name);
                     setShowCategories(false);
+
+                    setTimeout(() => {
+                      setProductLoading(false);
+                    }, 600); // smooth UX (Amazon-style)
                   }}
+
                 >
                   {cat.name === 'Electronics' && (
                     <span className="category-tag">Popular</span>
@@ -474,15 +503,19 @@ const Category = () => {
 
                 {/* Products */}
                 <div className={viewMode === 'grid' ? 'products-grid-3' : 'grid-2'}>
-                  {paginatedProducts.map((product, index) => (
-                    <div
-                      key={product.id}
-                      className="animate-fade-in productExtra"
-                      style={{ animationDelay: `${index * 0.05}s` }}
-                    >
-                      <ProductCard product={product} />
-                    </div>
-                  ))}
+                  {productLoading
+                    ? [...Array(ITEMS_PER_PAGE)].map((_, i) => (
+                      <ProductCardSkeleton key={i} />
+                    ))
+                    : paginatedProducts.map((product, index) => (
+                      <div
+                        key={product.id}
+                        className="animate-fade-in productExtra"
+                        style={{ animationDelay: `${index * 0.05}s` }}
+                      >
+                        <ProductCard product={product} />
+                      </div>
+                    ))}
                 </div>
 
                 {/* No Products Message */}

@@ -62,16 +62,14 @@ const ProductDetails = () => {
     if (!product) return;
 
     if (cartItem) {
-      // Product already in cart → just update quantity
-      updateQuantity(product.id, quantity);
+      // ✅ Increase existing quantity
+      updateQuantity(product.id, cartItem.quantity + quantity);
       toast.success("Cart updated");
     } else {
-      // First time add
-      addToCart(product);
-      updateQuantity(product.id, quantity);
+      // ✅ First add with selected quantity
+      addToCart({ ...product, quantity });
     }
   };
-
 
 
   const handleWishlist = () => {

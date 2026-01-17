@@ -2,6 +2,7 @@ import api from "../../../api/api";
 import { useEffect, useState } from "react";
 import ProductCard from "../ProductCard";
 import toast from "react-hot-toast";
+import ProductCardSkeleton from "../Skeletons/ProductCardSkeleton";
 
 const BestSellersSection = () => {
   const [bestSellers, setBestSellers] = useState([]);
@@ -32,8 +33,26 @@ const BestSellersSection = () => {
 
 
   if (loading) {
-    return <p style={{ textAlign: "center" }}>Loading best sellers...</p>;
+    return (
+      <section style={{ padding: "4rem 0", backgroundColor: "var(--background)" }}>
+        <div className="container-custom">
+          <div style={{ textAlign: "center", marginBottom: "3rem" }}>
+            <h2 className="section-title">Best Sellers</h2>
+            <p className="section-subtitle">
+              Necessitatibus eius consequatur ex aliquid fuga eum quidem sint consectetur velit
+            </p>
+          </div>
+
+          <div className="grid-4">
+            {[...Array(4)].map((_, i) => (
+              <ProductCardSkeleton key={i} />
+            ))}
+          </div>
+        </div>
+      </section>
+    );
   }
+
 
   return (
     <section style={{ padding: "4rem 0", backgroundColor: "var(--background)" }}>

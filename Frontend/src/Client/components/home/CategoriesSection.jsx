@@ -2,6 +2,7 @@ import api from "../../../api/api";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { Link } from "react-router-dom";
+import CategoryCardSkeleton from "../Skeletons/CategoryCardSkeleton";
 
 const CategoriesSection = () => {
   const [categories, setCategories] = useState([]);
@@ -27,8 +28,28 @@ const CategoriesSection = () => {
 
 
   if (loading) {
-    return <p style={{ textAlign: "center" }}>Loading categories...</p>;
+    return (
+      <section style={{ padding: "4rem 0", backgroundColor: "var(--secondary)" }}>
+        <div className="container-custom">
+          {/* Header */}
+          <div style={{ textAlign: "center", marginBottom: "3rem" }}>
+            <h2 className="section-title">Shop by Category</h2>
+            <p className="section-subtitle">
+              Browse our wide selection of categories to find exactly what you're looking for
+            </p>
+          </div>
+
+          {/* Skeleton Grid */}
+          <div className="grid-6">
+            {[...Array(6)].map((_, i) => (
+              <CategoryCardSkeleton key={i} />
+            ))}
+          </div>
+        </div>
+      </section>
+    );
   }
+
 
   return (
     <section style={{ padding: "4rem 0", backgroundColor: "var(--secondary)" }}>

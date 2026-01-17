@@ -122,13 +122,7 @@ const Footer = () => {
       {/* Bottom Footer */}
       <div className="footer-bottom">
         <div className="container-custom footer-bottom-content">
-          <p>© 2025 ShopAura. All rights reserved.</p>
-          <div className="footer-payments">
-            <CreditCard size={24} />
-            <CreditCard size={24} />
-            <CreditCard size={24} />
-            <CreditCard size={24} />
-          </div>
+          <p>©2026 ShopAura. All rights reserved.</p>
         </div>
       </div>
     </footer>

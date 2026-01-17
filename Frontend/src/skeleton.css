@@ -1,0 +1,24 @@
+/* ===== Skeleton Base ===== */
+.skeleton {
+  background: linear-gradient(
+    100deg,
+    var(--skeleton-bg) 40%,
+    var(--skeleton-shine) 50%,
+    var(--skeleton-bg) 60%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.2s ease-in-out infinite;
+  border-radius: 6px;
+}
+
+/* Theme-friendly */
+:root {
+  --skeleton-bg: #e5e7eb;
+  --skeleton-shine: #f3f4f6;
+}
+
+@keyframes skeleton-loading {
+  to {
+    background-position: -200% 0;
+  }
+}

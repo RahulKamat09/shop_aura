@@ -2,6 +2,7 @@ import api from "../../../api/api";
 import { useEffect, useState } from "react";
 import ProductCard from "../ProductCard";
 import toast from "react-hot-toast";
+import ProductCardSkeleton from "../Skeletons/ProductCardSkeleton";
 
 const tabs = ["All", "Clothing", "Accessories", "Electronics"];
 
@@ -36,10 +37,6 @@ const ProductsSection = () => {
   }, [activeTab]);
 
 
-  if (loading) {
-    return <p style={{ textAlign: "center" }}>Loading products...</p>;
-  }
-
   return (
     <section style={{ padding: "4rem 0", backgroundColor: "var(--secondary)" }}>
       <div className="container-custom">
@@ -62,15 +59,19 @@ const ProductsSection = () => {
 
         {/* Products Grid */}
         <div className="grid-4">
-          {products.map((product, index) => (
-            <div
-              key={product.id}
-              className="animate-scale-in"
-              style={{ animationDelay: `${index * 0.05}s` }}
-            >
-              <ProductCard product={product} />
-            </div>
-          ))}
+          {loading
+            ? [...Array(12)].map((_, i) => (
+              <ProductCardSkeleton key={i} />
+            ))
+            : products.map((product, index) => (
+              <div
+                key={product.id}
+                className="animate-scale-in"
+                style={{ animationDelay: `${index * 0.05}s` }}
+              >
+                <ProductCard product={product} />
+              </div>
+            ))}
         </div>
       </div>
     </section>

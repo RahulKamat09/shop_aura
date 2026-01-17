@@ -1,7 +1,9 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Search, User, Heart, ShoppingCart, Phone, Truck, Menu, X, ChevronDown } from 'lucide-react';
 import { useCart } from '../../context/CartContext';
+import { useNavigate } from 'react-router-dom';
+import api from '../../../api/api';
 
 const Header = () => {
   const location = useLocation();
@@ -9,6 +11,58 @@ const Header = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const isLoggedIn = !!localStorage.getItem("token");
+
+
+  const navigate = useNavigate();
+  const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [searchResults, setSearchResults] = useState([]);
+  const [showDropdown, setShowDropdown] = useState(false);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [productsRes, categoriesRes] = await Promise.all([
+          api.get('/products'),
+          api.get('/categories')
+        ]);
+
+        setProducts(productsRes.data);
+        setCategories(categoriesRes.data);
+
+      } catch (error) {
+        console.error('Search data fetch error:', error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+
+
+  const handleSearch = (value) => {
+    setSearchQuery(value);
+
+    if (!value.trim()) {
+      setSearchResults([]);
+      setShowDropdown(false);
+      return;
+    }
+
+    const q = value.toLowerCase();
+
+    const matchedProducts = products.filter(p =>
+      p.name.toLowerCase().includes(q)
+    );
+
+    setSearchResults([
+      ...matchedProducts.map(p => ({ ...p, type: 'product' }))
+    ]);
+
+    setShowDropdown(true);
+  };
+
+
 
   const navLinks = [
     { path: '/', label: 'Home' },
@@ -60,12 +114,32 @@ const Header = () => {
               type="text"
               placeholder="Search for products"
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={(e) => handleSearch(e.target.value)}
             />
             <button>
               <Search size={20} />
             </button>
           </div>
+
+          {showDropdown && searchResults.length > 0 && (
+            <div className="search-dropdown">
+              {searchResults.slice(0, 20).map(item => (
+                <div
+                  key={`${item.type}-${item.id}`}
+                  className="search-item"
+                  onClick={() => {
+                    setShowDropdown(false);
+                    setSearchQuery('');
+                    navigate(`/product/${item.id}`);
+                  }}
+                >
+                  <span>{item.name}</span>
+                  <small>{item.type}</small>
+                </div>
+              ))}
+            </div>
+          )}
+
 
           {/* Icons */}
           <div className="header-icons">

@@ -1,6 +1,6 @@
 import api from "../../api/api";
 import toast from 'react-hot-toast';
-import { Store, LayoutDashboard, Package, FolderOpen, ShoppingCart, Users, MessageSquare, Settings, ChevronLeft, LogOut, X } from 'lucide-react';
+import { Store, LayoutDashboard, Package, FolderOpen, ShoppingCart, Users, MessageSquare, Settings, ChevronLeft, LogOut, X, Image } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 
@@ -13,7 +13,8 @@ function Sidebar({ currentPage, onNavigate, sidebarCollapsed, setSidebarCollapse
     { id: 'orders', label: 'Orders', icon: ShoppingCart },
     { id: 'customers', label: 'Customers', icon: Users },
     { id: 'messages', label: 'Messages', icon: MessageSquare },
-    { id: 'settings', label: 'Settings', icon: Settings }
+    { id: 'settings', label: 'Settings', icon: Settings },
+    { id: 'banners', label: 'Banners', icon: Image }
   ];
 
   const [admin, setAdmin] = useState(null);
@@ -69,7 +70,7 @@ function Sidebar({ currentPage, onNavigate, sidebarCollapsed, setSidebarCollapse
       <div className="sidebar-header">
         <div className="sidebar-logo">
           <Store />
-          <span>eStore</span>
+          <span>ShopAura</span>
         </div>
         <button
           className="sidebar-toggle desktop-only"

@@ -1151,6 +1151,38 @@
       "total": 249.99,
       "status": "Pending",
       "date": "2026-01-08"
+    },
+    {
+      "id": "ORD_1768124416494",
+      "userId": "u_1768124381331",
+      "customer": {
+        "name": "Tushar Solanki ",
+        "email": "tushar23@gmail.com",
+        "phone": "07203806609"
+      },
+      "shippingAddress": {
+        "address": "BLOCK-B-SF-208 OM SHANTI GOLD PLUS-2 VATVA GAMDI ROAD VATVA",
+        "city": "AHMEDABAD",
+        "state": "Gujarat",
+        "zip": "382440",
+        "country": "United Kingdom"
+      },
+      "payment": {
+        "method": "cod",
+        "status": "Pending"
+      },
+      "items": [
+        {
+          "productId": "1",
+          "name": "Men’s Premium Cotton Casual Shirt",
+          "price": 87.99,
+          "qty": 4,
+          "image": "https://m.media-amazon.com/images/I/51jT9G0QYhL._SY741_.jpg"
+        }
+      ],
+      "total": 351.96,
+      "status": "Pending",
+      "date": "2026-01-11"
     }
   ],
   "customers": [
@@ -1175,6 +1207,17 @@
       "orders": 3,
       "totalSpent": 572.95,
       "status": "Active"
+    },
+    {
+      "id": "u_1768124381331",
+      "name": "Tushar Solanki ",
+      "email": "tushar23@gmail.com",
+      "phone": "7878787878",
+      "password": "Tushar3434",
+      "registered": "2026-01-11",
+      "status": "Active",
+      "orders": 1,
+      "totalSpent": 351.96
     }
   ],
   "admin": {

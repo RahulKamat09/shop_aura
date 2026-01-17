@@ -32,17 +32,19 @@ export const CartProvider = ({ children }) => {
     setCartItems(prev => {
       const existing = prev.find(item => item.id === product.id);
 
+      const addQty = product.quantity ?? 1; // 👈 default to 1
+
       if (existing) {
-        toast.success(`${product.name} quantity increased`);
+        toast.success(`${product.name} quantity updated`);
         return prev.map(item =>
           item.id === product.id
-            ? { ...item, quantity: item.quantity + 1 }
+            ? { ...item, quantity: item.quantity + addQty }
             : item
         );
       }
 
       toast.success(`${product.name} added to cart`);
-      return [...prev, { ...product, quantity: 1 }];
+      return [...prev, { ...product, quantity: addQty }];
     });
   };
 
@@ -61,21 +63,21 @@ export const CartProvider = ({ children }) => {
 
 
   const updateQuantity = (productId, quantity) => {
-  if (quantity <= 0) {
-    removeFromCart(productId);
-    return;
-  }
+    if (quantity <= 0) {
+      removeFromCart(productId);
+      return;
+    }
 
-  setCartItems(prev =>
-    prev.map(item =>
-      item.id === productId
-        ? { ...item, quantity }
-        : item
-    )
-  );
-};
+    setCartItems(prev =>
+      prev.map(item =>
+        item.id === productId
+          ? { ...item, quantity }
+          : item
+      )
+    );
+  };
 
-  
+
 
   const clearCart = () => {
     setCartItems([]);
