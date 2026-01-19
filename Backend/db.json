@@ -1183,6 +1183,38 @@
       "total": 351.96,
       "status": "Pending",
       "date": "2026-01-11"
+    },
+    {
+      "id": "ORD_1768804041590",
+      "userId": "u_1768804005936",
+      "customer": {
+        "name": "Jay Khatik",
+        "email": "jaykhatik@gmail.com",
+        "phone": "07203806609"
+      },
+      "shippingAddress": {
+        "address": "BLOCK-B-SF-208 OM SHANTI GOLD PLUS-2 VATVA GAMDI ROAD VATVA",
+        "city": "AHMEDABAD",
+        "state": "Gujarat",
+        "zip": "382440",
+        "country": "United Kingdom"
+      },
+      "payment": {
+        "method": "cod",
+        "status": "Pending"
+      },
+      "items": [
+        {
+          "productId": "1",
+          "name": "Men’s Premium Cotton Casual Shirt",
+          "price": 87.99,
+          "qty": 1,
+          "image": "https://m.media-amazon.com/images/I/51jT9G0QYhL._SY741_.jpg"
+        }
+      ],
+      "total": 87.99,
+      "status": "Pending",
+      "date": "2026-01-19"
     }
   ],
   "customers": [
@@ -1207,6 +1239,17 @@
       "orders": 3,
       "totalSpent": 572.95,
       "status": "Active"
+    },
+    {
+      "id": "u_1768804005936",
+      "name": "Jay Khatik",
+      "email": "jaykhatik@gmail.com",
+      "phone": "9898989898",
+      "password": "jay2323",
+      "registered": "2026-01-19",
+      "status": "Active",
+      "orders": 1,
+      "totalSpent": 87.99
     }
   ],
   "admin": {
@@ -1249,36 +1292,60 @@
       "status": "unread"
     }
   ],
-  "banners": [
+  "reviews": [
     {
-      "title": "New Season Arrivals",
-      "subtitle": "Up to 40% Off",
-      "description": "On Trendy Clothing",
-      "image": "https://d1csarkz8obe9u.cloudfront.net/posterpreviews/summer-fashion-sale-banner-design-template-62077c541db2b288dbccd6d9d1c9af3d_screen.jpg?ts=1649932911",
-      "page": "home",
-      "category": "",
-      "active": true,
-      "id": 1
+      "id": 1,
+      "productId": 12,
+      "name": "Rahul",
+      "rating": 5,
+      "comment": "Amazing quality, loved it!",
+      "createdAt": "2026-01-18",
+      "adminReply": "Thanks a lot !!! Really Appriciated!!!!!"
     },
     {
-      "title": "sfugeuigh",
-      "subtitle": "shoigwau",
-      "description": "EHFUWEH",
-      "image": "UEFHIUWEFH",
-      "page": "home",
-      "category": "",
-      "active": true,
+      "name": "Jay Khatik ",
+      "rating": 4,
+      "comment": "Great Product!!! I Loved it !!!",
+      "productId": "3",
+      "createdAt": "2026-01-19T05:34:48.326Z",
+      "adminReply": "Thanks A Lot Batu!!!",
       "id": 2
     },
     {
-      "title": "New Arriva;",
-      "subtitle": "Get Upto 30% off",
-      "description": "Republic Day Sale",
-      "image": "https://marketplace.canva.com/EAG20zmI0Aw/1/0/1600w/canva-brown-and-beige-modern-new-product-sale-banner-landscape--U8HqZtV1w8.jpg",
-      "page": "home",
-      "category": "",
-      "active": true,
+      "name": "Prashant Parmar",
+      "rating": 5,
+      "comment": "Great Product Brother !!!",
+      "productId": "3",
+      "createdAt": "2026-01-19T05:43:26.074Z",
+      "adminReply": "",
       "id": 3
+    },
+    {
+      "name": "Rahul",
+      "rating": 5,
+      "comment": "Amazing Jacket !!!!!!!!!!",
+      "productId": "4",
+      "createdAt": "2026-01-19T05:50:42.915Z",
+      "adminReply": "",
+      "id": 4
+    },
+    {
+      "name": "Rahul Kamat",
+      "rating": 3,
+      "comment": "Excellent Product!!!",
+      "productId": "1",
+      "createdAt": "2026-01-19T05:57:54.468Z",
+      "adminReply": "",
+      "id": 5
+    },
+    {
+      "name": "Jay Khatik",
+      "rating": 5,
+      "comment": "Great Product!!",
+      "productId": "4",
+      "createdAt": "2026-01-19T05:59:51.778Z",
+      "adminReply": "Thanks A lot",
+      "id": 6
     }
   ]
 }

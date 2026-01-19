@@ -1,6 +1,6 @@
 import api from "../../api/api";
 import { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import Layout from '../components/layout/Layout';
 import { useCart } from '../context/CartContext';
 import { Star, Heart, Minus, Plus, Truck, Shield, RotateCcw } from 'lucide-react';
@@ -15,6 +15,31 @@ const ProductDetails = () => {
   const [selectedImage, setSelectedImage] = useState(null);
   const { addToCart, addToWishlist, isInWishlist, removeFromWishlist, updateQuantity, cartItems } = useCart();
   const [loading, setLoading] = useState(true);
+  const [reviews, setReviews] = useState([]);
+  const [reviewLoading, setReviewLoading] = useState(false);
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+
+  const [averageRating, setAverageRating] = useState(0);
+  const [reviewCount, setReviewCount] = useState(0);
+  const [loggedInUser, setLoggedInUser] = useState(null);
+
+
+
+
+  const navigate = useNavigate();
+
+  const token = localStorage.getItem("token");
+  const userId = localStorage.getItem("userId");
+
+  const isLoggedIn = Boolean(token && userId);
+
+
+  const [reviewForm, setReviewForm] = useState({
+    name: "",
+    rating: 5,
+    comment: ""
+  });
+
 
   const cartItem = product
     ? cartItems.find(item => item.id === product.id)
@@ -80,6 +105,106 @@ const ProductDetails = () => {
     }
   };
 
+  // Fetch Reviews 
+
+  const fetchReviews = async () => {
+    try {
+      setReviewLoading(true);
+      const { data } = await api.get(`/reviews?productId=${product.id}`);
+
+      setReviews(data);
+      calculateRatings(data); // 🔥 IMPORTANT
+    } catch (error) {
+      toast.error("Failed to load reviews");
+    } finally {
+      setReviewLoading(false);
+    }
+  };
+
+
+  useEffect(() => {
+    if (product?.id) {
+      fetchReviews();
+    }
+  }, [product]);
+
+  // Handle Submit Review
+
+  const handleReviewSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!isLoggedIn) {
+      toast.error("Please login to submit a review");
+      navigate("/auth");
+      return;
+    }
+
+    try {
+      await api.post("/reviews", {
+        ...reviewForm,
+        productId: product.id,
+        userId,                // ✅ associate review with user
+        createdAt: new Date().toISOString(),
+        adminReply: ""
+      });
+
+      toast.success("Review submitted");
+      setReviewForm({ name: "", rating: 5, comment: "" });
+      fetchReviews();
+    } catch {
+      toast.error("Failed to submit review");
+    }
+  };
+
+
+  // Count Reviews 
+
+  const calculateRatings = (reviewsData) => {
+    if (!reviewsData || reviewsData.length === 0) {
+      setAverageRating(0);
+      setReviewCount(0);
+      return;
+    }
+
+    const total = reviewsData.reduce((sum, r) => sum + r.rating, 0);
+    const avg = total / reviewsData.length;
+
+    setAverageRating(Math.round(avg * 10) / 10); // 1 decimal
+    setReviewCount(reviewsData.length);
+  };
+
+  // Get Users Name 
+
+  useEffect(() => {
+    const fetchLoggedInUser = async () => {
+      if (!isLoggedIn) return;
+
+      try {
+        const { data } = await api.get(`/customers/${userId}`, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+
+        setLoggedInUser(data);
+
+        // auto-fill name in review form
+        setReviewForm((prev) => ({
+          ...prev,
+          name: data.name
+        }));
+
+      } catch (error) {
+        console.error("Failed to fetch user", error);
+        toast.error("Failed to load user details");
+      }
+    };
+
+    fetchLoggedInUser();
+  }, [isLoggedIn, userId, token]);
+
+
+
   if (loading || !product) {
     return (
       <Layout>
@@ -144,14 +269,16 @@ const ProductDetails = () => {
                   <Star
                     key={i}
                     size={18}
-                    className={i < product.rating ? 'star' : 'star-empty'}
-                    fill={i < product.rating ? 'currentColor' : 'none'}
+                    className={i < Math.round(averageRating) ? 'star' : 'star-empty'}
+                    fill={i < Math.round(averageRating) ? 'currentColor' : 'none'}
                   />
                 ))}
+
                 <span style={{ marginLeft: '0.5rem', color: 'var(--muted-foreground)' }}>
-                  ({product.reviews} reviews)
+                  ({reviewCount} reviews)
                 </span>
               </div>
+
 
               <div className="product-details-price">
                 <span className="price-current">${product.price.toFixed(2)}</span>
@@ -234,74 +361,73 @@ const ProductDetails = () => {
 
       <div className="container-custom">
         {/* ------------------------------------
-     PRODUCT DESCRIPTION SECTION
-------------------------------------- */}
+      PRODUCT DESCRIPTION SECTION
+  ------------------------------------- */}
         <div className="pd-section-block">
           <h2 className="pd-title">Product Description</h2>
           <p className="pd-text">
             {product.fullDescription ||
               `This ${product.name} is crafted with premium materials and designed for 
-      comfort, durability, and modern style. Suitable for daily wear or 
-      special occasions, it offers a premium feel and long-lasting quality.`}
+        comfort, durability, and modern style. Suitable for daily wear or 
+        special occasions, it offers a premium feel and long-lasting quality.`}
           </p>
         </div>
 
         {/* ------------------------------------
-        CUSTOMER REVIEWS SECTION
-------------------------------------- */}
+          CUSTOMER REVIEWS SECTION
+  ------------------------------------- */}
         <div className="pd-section-block">
           <h2 className="pd-title">Customer Reviews</h2>
 
-          <div className="pd-rating-summary">
-            <span className="pd-rating-score">{product.rating}.0</span>
-            <div className="pd-rating-stars">
-              {[...Array(5)].map((_, i) => (
-                <Star
-                  key={i}
-                  size={20}
-                  className={i < product.rating ? "star" : "star-empty"}
-                  fill={i < product.rating ? "currentColor" : "none"}
-                />
-              ))}
-            </div>
-            <span className="pd-review-count">({product.reviews} reviews)</span>
-          </div>
+          {reviewLoading && <p>Loading reviews...</p>}
 
-          {/* Example Reviews */}
-          <div className="pd-review-card">
-            <h4 className="pd-review-name">John Doe</h4>
-            <div className="pd-review-stars">
-              {[...Array(5)].map((_, i) => (
-                <Star
-                  key={i}
-                  size={18}
-                  className={i < product.rating ? "star" : "star-empty"}
-                  fill={i < product.rating ? "currentColor" : "none"}
-                />
-              ))}
-            </div>
-            <p className="pd-review-text">
-              Great quality! Exceeded my expectations, definitely worth the price.
-            </p>
-          </div>
+          {!reviewLoading && reviews.length === 0 && (
+            <p>No reviews yet. Be the first to review this product.</p>
+          )}
 
-          <div className="pd-review-card">
-            <h4 className="pd-review-name">Sarah Wilson</h4>
-            <div className="pd-review-stars">
-              {[...Array(5)].map((_, i) => (
-                <Star
-                  key={i}
-                  size={18}
-                  className={i < product.rating ? "star" : "star-empty"}
-                  fill={i < product.rating ? "currentColor" : "none"}
-                />
-              ))}
+          {reviews.map((review) => (
+            <div key={review.id} className="pd-review-card">
+              <h4 className="pd-review-name">{review.name}</h4>
+
+              <div className="pd-review-stars">
+                {[...Array(5)].map((_, i) => (
+                  <Star
+                    key={i}
+                    size={18}
+                    className={i < review.rating ? "star" : "star-empty"}
+                    fill={i < review.rating ? "currentColor" : "none"}
+                  />
+                ))}
+              </div>
+
+              <p className="pd-review-text">{review.comment}</p>
+
+              {review.adminReply && (
+                <div className="pd-admin-reply">
+                  <strong>Admin Reply:</strong>
+                  <p>{review.adminReply}</p>
+                </div>
+              )}
             </div>
-            <p className="pd-review-text">
-              Amazing comfort and superb craftsmanship. Highly recommended!
-            </p>
-          </div>
+          ))}
         </div>
+
+        {isLoggedIn ? (
+          <button
+            className="btn-primary btn-extra"
+            onClick={() => setIsReviewModalOpen(true)}
+          >
+            Write a Review
+          </button>
+        ) : (
+          <button
+            className="btn-primary btn-extra"
+            onClick={() => navigate("/auth")}
+          >
+            Login to write a review
+          </button>
+        )}
+
 
       </div>
 
@@ -322,6 +448,62 @@ const ProductDetails = () => {
           </section>
         )
       }
+
+      {isReviewModalOpen && (
+        <div className="review-modal-overlay" onClick={() => setIsReviewModalOpen(false)}>
+          <div
+            className="review-modal"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div className="review-modal-header">
+              <h3>Write a Review</h3>
+              <button
+                className="review-modal-close"
+                onClick={() => setIsReviewModalOpen(false)}
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Form */}
+            <form className="pd-review-form" onSubmit={(e) => {
+              handleReviewSubmit(e);
+              setIsReviewModalOpen(false);
+            }}>
+              <input
+                type="text"
+                value={reviewForm.name}
+                disabled
+                className="review-name-disabled"
+              />
+
+              <select
+                value={reviewForm.rating}
+                onChange={(e) =>
+                  setReviewForm({ ...reviewForm, rating: Number(e.target.value) })
+                }
+              >
+                {[5, 4, 3, 2, 1].map((r) => (
+                  <option key={r} value={r}>{r} Stars</option>
+                ))}
+              </select>
+
+              <textarea
+                placeholder="Write your review..."
+                required
+                value={reviewForm.comment}
+                onChange={(e) =>
+                  setReviewForm({ ...reviewForm, comment: e.target.value })
+                }
+              />
+
+              <button className="btn-primary">Submit Review</button>
+            </form>
+          </div>
+        </div>
+      )}
+
     </Layout >
   );
 };

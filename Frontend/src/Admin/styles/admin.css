@@ -2070,3 +2070,257 @@ body {
   background: var(--admin-border);
   border-radius: 10px;
 }
+
+/* Admin Review */
+
+/* =====================================
+   ADMIN REVIEWS (FINAL STRUCTURE)
+===================================== */
+
+.admin-page {
+  padding: 24px;
+}
+
+.admin-page h2 {
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 24px;
+  color: var(--admin-text);
+}
+
+/* Review Card */
+.admin-review-card {
+  background: var(--admin-card-bg);
+  border: 1px solid var(--admin-border);
+  border-radius: var(--admin-radius-lg);
+  padding: 20px;
+  margin-bottom: 16px;
+  box-shadow: var(--admin-shadow);
+  transition: var(--admin-transition);
+}
+
+.admin-review-card:hover {
+  box-shadow: var(--admin-shadow-lg);
+}
+
+/* Top Section (Product Info) */
+.admin-review-top {
+  margin-bottom: 12px;
+}
+
+.admin-review-product {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.admin-review-product-img {
+  width: 56px;
+  height: 56px;
+  border-radius: var(--admin-radius);
+  object-fit: cover;
+  border: 1px solid var(--admin-border);
+  background-color: var(--admin-bg);
+}
+
+.admin-review-product-name {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--admin-text);
+}
+
+/* Customer + Rating */
+.admin-review-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.admin-review-header strong {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--admin-text);
+}
+
+.admin-review-stars {
+  display: flex;
+  gap: 2px;
+  color: #f59e0b;
+}
+
+/* Review Text */
+.admin-review-text {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--admin-text-muted);
+  margin-bottom: 14px;
+}
+
+/* Reply Textarea */
+.admin-review-card textarea {
+  width: 100%;
+  min-height: 90px;
+  padding: 12px;
+  font-size: 14px;
+  font-family: inherit;
+  border-radius: var(--admin-radius);
+  border: 1px solid var(--admin-border);
+  background-color: var(--admin-bg);
+  resize: vertical;
+  transition: var(--admin-transition);
+}
+
+.admin-review-card textarea:focus {
+  outline: none;
+  border-color: var(--admin-primary);
+  background-color: var(--admin-card-bg);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.admin-review-card textarea::placeholder {
+  color: var(--admin-text-muted);
+}
+
+/* Actions */
+.admin-review-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+/* Reply Button */
+.reply-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  border-radius: var(--admin-radius);
+  border: none;
+  cursor: pointer;
+  background-color: var(--admin-info-light);
+  color: var(--admin-primary);
+  transition: var(--admin-transition);
+}
+
+.reply-btn:hover {
+  background-color: var(--admin-primary);
+  color: #fff;
+}
+
+/* Delete Button */
+.delete-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  border-radius: var(--admin-radius);
+  border: none;
+  cursor: pointer;
+  background-color: var(--admin-danger-light);
+  color: var(--admin-danger);
+  transition: var(--admin-transition);
+}
+
+.delete-btn:hover {
+  background-color: var(--admin-danger);
+  color: #fff;
+}
+
+/* =====================================
+   EDIT REPLY BUTTON (ADMIN REVIEWS)
+===================================== */
+
+.edit-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  border-radius: var(--admin-radius);
+  border: none;
+  cursor: pointer;
+  background-color: var(--admin-warning-light);
+  color: var(--admin-warning);
+  transition: var(--admin-transition);
+}
+
+/* Hover */
+.edit-btn:hover {
+  background-color: var(--admin-warning);
+  color: #ffffff;
+}
+
+/* Active click */
+.edit-btn:active {
+  transform: scale(0.97);
+}
+
+/* Focus (accessibility) */
+.edit-btn:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.25);
+}
+
+/* Disabled (optional future use) */
+.edit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Empty / Loading text */
+.admin-page>p {
+  font-size: 14px;
+  color: var(--admin-text-muted);
+}
+
+/* Admin Reply Display */
+.admin-reply-box {
+  background-color: var(--admin-info-light);
+  border-left: 4px solid var(--admin-primary);
+  padding: 12px 14px;
+  border-radius: var(--admin-radius);
+  margin-bottom: 14px;
+}
+
+.admin-reply-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--admin-primary);
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+
+.admin-reply-text {
+  font-size: 14px;
+  color: var(--admin-text);
+  line-height: 1.5;
+}
+
+
+/* Responsive */
+@media (max-width: 768px) {
+  .admin-page {
+    padding: 16px;
+  }
+
+  .admin-review-card {
+    padding: 16px;
+  }
+
+  .admin-review-product-img {
+    width: 48px;
+    height: 48px;
+  }
+
+  .admin-review-card textarea {
+    min-height: 80px;
+  }
+}

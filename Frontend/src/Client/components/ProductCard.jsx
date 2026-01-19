@@ -32,6 +32,8 @@ const ProductCard = ({ product }) => {
     }
   };
 
+  // Helper For Reviews
+
   return (
     <div
       className="product-card"
