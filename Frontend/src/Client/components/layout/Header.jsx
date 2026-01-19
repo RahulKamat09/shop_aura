@@ -68,7 +68,6 @@ const Header = () => {
     { path: '/', label: 'Home' },
     { path: '/about', label: 'About' },
     { path: '/category', label: 'Category' },
-    { path: '/product/1', label: 'Product Details' },
     { path: '/contact', label: 'Contact' },
     !isLoggedIn && { path: '/auth', label: 'Login' }
   ];

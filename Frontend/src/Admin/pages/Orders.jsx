@@ -114,6 +114,66 @@ function Orders() {
     }
   };
 
+  /* ---------------- UPDATE ORDER STATUS (MODAL) ---------------- */
+  const updateOrderStatusFromModal = async (orderId, status) => {
+    try {
+      await api.patch(`/orders/${orderId}`, { status });
+
+      setOrders(prev =>
+        prev.map(order =>
+          order.id === orderId ? { ...order, status } : order
+        )
+      );
+
+      setViewingOrder(prev => ({ ...prev, status }));
+      toast.success("Order status updated");
+    } catch {
+      toast.error("Failed to update order status");
+    }
+  };
+
+  /* ---------------- UPDATE PAYMENT STATUS (COD ONLY) ---------------- */
+  const updatePaymentStatus = async (orderId, paymentStatus) => {
+    // ⛔ Block update if order is completed or cancelled
+    if (["Completed", "Cancelled"].includes(viewingOrder.status)) {
+      toast.error("Payment cannot be updated for completed or cancelled orders");
+      return;
+    }
+
+    // ⛔ Block update if payment is NOT COD
+    if (viewingOrder.payment?.method !== "cod") {
+      toast.error("Payment status can only be updated for COD orders");
+      return;
+    }
+
+    try {
+      await api.patch(`/orders/${orderId}`, {
+        payment: {
+          ...viewingOrder.payment,
+          status: paymentStatus
+        }
+      });
+
+      setOrders(prev =>
+        prev.map(order =>
+          order.id === orderId
+            ? { ...order, payment: { ...order.payment, status: paymentStatus } }
+            : order
+        )
+      );
+
+      setViewingOrder(prev => ({
+        ...prev,
+        payment: { ...prev.payment, status: paymentStatus }
+      }));
+
+      toast.success("Payment status updated");
+    } catch {
+      toast.error("Failed to update payment status");
+    }
+  };
+
+
   if (loading) {
     return (
       <p style={{ padding: '2rem', textAlign: 'center' }}>
@@ -182,18 +242,9 @@ function Orders() {
                 </td>
                 <td>{order.date}</td>
                 <td>
-                  <div className="status-select">
-                    <select
-                      className={getStatusClass(order.status)}
-                      value={order.status}
-                      onChange={(e) => handleStatusChange(order.id, e.target.value)}
-                    >
-                      <option value="Pending">Pending</option>
-                      <option value="Processing">Processing</option>
-                      <option value="Completed">Completed</option>
-                      <option value="Cancelled">Cancelled</option>
-                    </select>
-                  </div>
+                  <span className={`status-badge ${getStatusClass(order.status)}`}>
+                    {order.status}
+                  </span>
                 </td>
                 <td style={{ fontWeight: 500 }}>${order.total.toFixed(2)}</td>
                 <td>
@@ -225,11 +276,30 @@ function Orders() {
       >
         {viewingOrder && (
           <div className="detail-view">
-            <div className="order-status-header">
-              <span className={`status-badge ${getStatusClass(viewingOrder.status)}`}>
-                {viewingOrder.status}
-              </span>
+            <div className="detail-section">
+              <h4 className="detail-section-title">Order Status</h4>
+
+              <select
+                className={`status-badge ${getStatusClass(viewingOrder.status)}`}
+                value={viewingOrder.status}
+                disabled={["Completed", "Cancelled"].includes(viewingOrder.status)}
+                onChange={(e) =>
+                  updateOrderStatusFromModal(viewingOrder.id, e.target.value)
+                }
+              >
+                <option value="Pending">Pending</option>
+                <option value="Processing">Processing</option>
+                <option value="Completed">Completed</option>
+                <option value="Cancelled">Cancelled</option>
+              </select>
+
+              {["Completed", "Cancelled"].includes(viewingOrder.status) && (
+                <p className="text-muted" style={{ marginTop: "0.5rem" }}>
+                  🔒 Order status is locked
+                </p>
+              )}
             </div>
+
 
             <div className="detail-section">
               <h4 className="detail-section-title">Customer Information</h4>
@@ -273,14 +343,48 @@ function Orders() {
               <div className="detail-row">
                 <CreditCard size={18} />
                 <div>
-                  <span className="detail-label">Payment Method</span>
-                  <p className="detail-value">
-                    {viewingOrder.payment?.method?.toUpperCase()} <br />
-                    Status: {viewingOrder.payment?.status}
-                  </p>
+                  <span className="detail-label">Payment</span>
 
+                  <div style={{ marginTop: "0.25rem" }}>
+                    <span className="status-badge processing">
+                      {viewingOrder.payment?.method?.toUpperCase()}
+                    </span>
+                  </div>
+
+                  {/* COD → editable */}
+                  {viewingOrder.payment?.method === "cod" &&
+                    !["Completed", "Cancelled"].includes(viewingOrder.status) ? (
+                    <>
+                      <select
+                        value={viewingOrder.payment.status}
+                        onChange={(e) =>
+                          updatePaymentStatus(viewingOrder.id, e.target.value)
+                        }
+                        style={{ marginTop: "0.5rem" }}
+                      >
+                        <option value="Pending">Pending</option>
+                        <option value="Paid">Paid</option>
+                      </select>
+
+                      <p className="text-muted">
+                        COD payment can be manually confirmed
+                      </p>
+                    </>
+                  ) : (
+                    <p className="detail-value">
+                      Status:{" "}
+                      <strong>{viewingOrder.payment?.status}</strong>
+                    </p>
+                  )}
+
+                  {["Completed", "Cancelled"].includes(viewingOrder.status) && (
+                    <p className="text-muted">
+                      🔒 Payment status locked
+                    </p>
+                  )}
                 </div>
               </div>
+
             </div>
 
             <div className="detail-section">
@@ -308,21 +412,20 @@ function Orders() {
             </div>
 
             <div className="order-total">
-              <div className="order-total-row">
-                <span>Subtotal</span>
-                <span>${(viewingOrder.total * 0.9).toFixed(2)}</span>
+              <div className="order-total-left">
+                <div className="row">
+                  <span>Subtotal</span>
+                  <span>$77.99</span>
+                </div>
+                <div className="row">
+                  <span>Shipping</span>
+                  <span>$10.00</span>
+                </div>
               </div>
-              <div className="order-total-row">
-                <span>Shipping</span>
-                <span>$10.00</span>
-              </div>
-              <div className="order-total-row">
-                <span>Tax</span>
-                <span>${(viewingOrder.total * 0.1 - 10).toFixed(2)}</span>
-              </div>
-              <div className="order-total-row total">
-                <span>Total</span>
-                <span>${viewingOrder.total.toFixed(2)}</span>
+
+              <div className="order-total-right">
+                <span className="label">Total</span>
+                <span className="amount">$87.99</span>
               </div>
             </div>
           </div>

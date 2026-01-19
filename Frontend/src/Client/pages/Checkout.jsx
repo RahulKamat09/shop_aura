@@ -1,23 +1,34 @@
+// ================= IMPORTS =================
 import api from "../../api/api";
 import toast from "react-hot-toast";
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Layout from '../components/layout/Layout';
 import { useCart } from '../context/CartContext';
 import { CreditCard, Truck, Check } from 'lucide-react';
 
+// ================= CHECKOUT COMPONENT =================
 const Checkout = () => {
+
+  // 🛒 Cart data from global cart context
   const { cartItems, getCartTotal, clearCart } = useCart();
   const navigate = useNavigate();
 
+  // ⏳ Order & payment states
   const [isProcessing, setIsProcessing] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState("card");
   const [orderSuccess, setOrderSuccess] = useState(false);
 
+  // 🔄 Loading state while fetching user & address
+  const [loadingCheckoutData, setLoadingCheckoutData] = useState(true);
+
+  // 👤 Logged-in user id
   const userId = localStorage.getItem("userId");
 
-  /* ---------------- PLACE ORDER ---------------- */
+  /* ================= PLACE ORDER ================= */
   const placeOrder = async () => {
+
+    // ❌ Safety check
     if (!userId || cartItems.length === 0) {
       toast.error("Cart is empty or user not logged in");
       return;
@@ -26,26 +37,29 @@ const Checkout = () => {
     try {
       setIsProcessing(true);
 
-      /* 1️⃣ Fetch user */
+      // 1️⃣ Fetch customer details
       const { data: user } = await api.get(`/customers/${userId}`);
 
+      // 🚫 Prevent inactive users from ordering
       if (user?.status !== "Active") {
         toast.error("Your account is inactive. You cannot place orders.");
         setIsProcessing(false);
         return;
       }
 
-      /* 2️⃣ Create order object */
+      // 2️⃣ Build order payload
       const newOrder = {
         id: "ORD_" + Date.now(),
         userId,
 
+        // Customer information
         customer: {
-          name: user.name,
-          email: user.email,
+          name: `${formData.firstName} ${formData.lastName}`,
+          email: formData.email,
           phone: formData.phone
         },
 
+        // Shipping address
         shippingAddress: {
           address: formData.address,
           city: formData.city,
@@ -54,11 +68,13 @@ const Checkout = () => {
           country: formData.country
         },
 
+        // Payment details
         payment: {
           method: paymentMethod,
           status: paymentMethod === "cod" ? "Pending" : "Paid"
         },
 
+        // Ordered items
         items: cartItems.map(item => ({
           productId: item.id,
           name: item.name,
@@ -67,6 +83,7 @@ const Checkout = () => {
           image: item.image
         })),
 
+        // Order total
         total: cartItems.reduce(
           (sum, i) => sum + i.price * i.quantity,
           0
@@ -76,18 +93,17 @@ const Checkout = () => {
         date: new Date().toISOString().split("T")[0]
       };
 
-      /* 3️⃣ Save order */
+      // 3️⃣ Save order to database
       await api.post("/orders", newOrder);
 
-      /* 4️⃣ Update customer stats (PATCH = safe) */
+      // 4️⃣ Update customer stats safely
       await api.patch(`/customers/${userId}`, {
         orders: (user.orders || 0) + 1,
         totalSpent: (user.totalSpent || 0) + newOrder.total
       });
 
-      /* 5️⃣ Success feedback */
+      // 5️⃣ Success handling
       toast.success("Order placed successfully 🎉");
-
       clearCart();
       setOrderSuccess(true);
 
@@ -99,7 +115,10 @@ const Checkout = () => {
     }
   };
 
+  /* ================= VALIDATION ================= */
   const validateCheckout = () => {
+
+    // Required shipping fields
     const requiredFields = [
       "firstName",
       "lastName",
@@ -119,7 +138,7 @@ const Checkout = () => {
       }
     }
 
-    // Payment-specific validation
+    // Card payment validation
     if (paymentMethod === "card") {
       if (!formData.cardNumber || !formData.cardName || !formData.expiry || !formData.cvv) {
         toast.error("Please fill all card details");
@@ -127,6 +146,7 @@ const Checkout = () => {
       }
     }
 
+    // UPI validation
     if (paymentMethod === "upi" && !formData.upiId) {
       toast.error("Please enter UPI ID");
       return false;
@@ -135,7 +155,7 @@ const Checkout = () => {
     return true;
   };
 
-  /* ---------------- FORM STATE ---------------- */
+  /* ================= FORM STATE ================= */
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -152,19 +172,71 @@ const Checkout = () => {
     cvv: '',
   });
 
+  // 🚚 Shipping & order total
   const shipping = getCartTotal() > 50 ? 0 : 10;
   const total = getCartTotal() + shipping;
 
+  // 🔄 Input handler
   const handleInputChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  // 🧾 Submit handler
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!validateCheckout()) return;
     placeOrder();
   };
 
+  /* ================= PRELOAD USER & DEFAULT ADDRESS ================= */
+  useEffect(() => {
+    if (!userId) return;
+
+    const loadCheckoutData = async () => {
+      try {
+        // Fetch customer details
+        const { data: customer } = await api.get(`/customers/${userId}`);
+
+        // Fetch default address
+        const { data: addressList } = await api.get(
+          `/addresses?userId=${userId}&isDefault=true`
+        );
+
+        const defaultAddress = addressList?.[0];
+
+        // Pre-fill checkout form (still editable)
+        setFormData(prev => ({
+          ...prev,
+          firstName: customer?.name?.split(" ")[0] || "",
+          lastName: customer?.name?.split(" ").slice(1).join(" ") || "",
+          email: customer?.email || "",
+          phone: customer?.phone || "",
+          address: defaultAddress?.address || "",
+          city: defaultAddress?.city || "",
+          state: defaultAddress?.state || "",
+          zip: defaultAddress?.zipCode || "",
+          country: defaultAddress?.country || prev.country,
+        }));
+
+      } catch (error) {
+        toast.error("Failed to load checkout details");
+      } finally {
+        setLoadingCheckoutData(false);
+      }
+    };
+
+    loadCheckoutData();
+  }, [userId]);
+
+  if (loadingCheckoutData) {
+    return (
+      <Layout>
+        <div className="container-custom" style={{ padding: "4rem", textAlign: "center" }}>
+          <p>Loading checkout details...</p>
+        </div>
+      </Layout>
+    );
+  }
 
 
   if (cartItems.length === 0 && !orderSuccess) {

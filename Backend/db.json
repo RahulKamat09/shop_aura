@@ -995,7 +995,7 @@
       },
       "payment": {
         "method": "cod",
-        "status": "Pending"
+        "status": "Paid"
       },
       "items": [
         {
@@ -1149,7 +1149,7 @@
         }
       ],
       "total": 249.99,
-      "status": "Pending",
+      "status": "Cancelled",
       "date": "2026-01-08"
     },
     {
@@ -1201,7 +1201,7 @@
       },
       "payment": {
         "method": "cod",
-        "status": "Pending"
+        "status": "Paid"
       },
       "items": [
         {
@@ -1213,6 +1213,52 @@
         }
       ],
       "total": 87.99,
+      "status": "Cancelled",
+      "date": "2026-01-19"
+    },
+    {
+      "id": "ORD_1768833242706",
+      "userId": "u_1768804005936",
+      "customer": {
+        "name": "Jay Khatik",
+        "email": "jaykhatik@gmail.com",
+        "phone": "9898989898"
+      },
+      "shippingAddress": {
+        "address": "BLOCK-B-SF-208 OM SHANTI GOLD PLUS-2 VATVA GAMDI ROAD VATVA",
+        "city": "AHMEDABAD",
+        "state": "Gujarat",
+        "zip": "382440",
+        "country": "India"
+      },
+      "payment": {
+        "method": "cod",
+        "status": "Pending"
+      },
+      "items": [
+        {
+          "productId": "1",
+          "name": "Men’s Premium Cotton Casual Shirt",
+          "price": 87.99,
+          "qty": 3,
+          "image": "https://m.media-amazon.com/images/I/51jT9G0QYhL._SY741_.jpg"
+        },
+        {
+          "productId": "25",
+          "name": "Titanium Sport Wristwatch",
+          "price": 299.99,
+          "qty": 1,
+          "image": "https://m.media-amazon.com/images/I/71SStaZIhYL._SX679_.jpg"
+        },
+        {
+          "productId": "13",
+          "name": "LED Study Desk Lamp",
+          "price": 34.99,
+          "qty": 1,
+          "image": "https://images.unsplash.com/photo-1519710164239-da123dc03ef4?auto=format&w=600"
+        }
+      ],
+      "total": 598.95,
       "status": "Pending",
       "date": "2026-01-19"
     }
@@ -1248,8 +1294,8 @@
       "password": "jay2323",
       "registered": "2026-01-19",
       "status": "Active",
-      "orders": 1,
-      "totalSpent": 87.99
+      "orders": 2,
+      "totalSpent": 686.94
     }
   ],
   "admin": {
@@ -1346,6 +1392,32 @@
       "createdAt": "2026-01-19T05:59:51.778Z",
       "adminReply": "Thanks A lot",
       "id": 6
+    }
+  ],
+  "addresses": [
+    {
+      "id": "addr101",
+      "userId": "u101",
+      "userName": "Rahul Kamat",
+      "address": "Flat 302, Sunrise Apartments",
+      "city": "Ahmedabad",
+      "state": "Gujarat",
+      "zipCode": "380015",
+      "country": "India",
+      "isDefault": true,
+      "createdAt": "2026-01-19T10:30:00Z"
+    },
+    {
+      "address": "BLOCK-B-SF-208 OM SHANTI GOLD PLUS-2 VATVA GAMDI ROAD VATVA",
+      "city": "AHMEDABAD",
+      "state": "Gujarat",
+      "zipCode": "382440",
+      "country": "India",
+      "isDefault": true,
+      "userId": "u_1768804005936",
+      "userName": "Jay Khatik",
+      "createdAt": "2026-01-19T14:24:06.304Z",
+      "id": "xe5pNgq"
     }
   ]
 }
