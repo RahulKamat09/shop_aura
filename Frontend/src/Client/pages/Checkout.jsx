@@ -23,7 +23,7 @@ const Checkout = () => {
   const [loadingCheckoutData, setLoadingCheckoutData] = useState(true);
 
   // 👤 Logged-in user id
-  const userId = localStorage.getItem("userId");
+  const userId = sessionStorage.getItem("userId");
 
   /* ================= PLACE ORDER ================= */
   const placeOrder = async () => {

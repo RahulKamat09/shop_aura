@@ -11,7 +11,7 @@ function AHeader({ onToggleSidebar, sidebarOpen, onNavigate }) {
   const navigate = useNavigate();
 
   const [admin, setAdmin] = useState(null);
-  const adminToken = localStorage.getItem("adminToken");
+  const adminToken = sessionStorage.getItem("adminToken");
 
   useEffect(() => {
     if (adminToken !== "admin_logged_in") return;
@@ -48,9 +48,9 @@ function AHeader({ onToggleSidebar, sidebarOpen, onNavigate }) {
   const handleLogout = () => {
     if (!window.confirm("Are you sure you want to logout?")) return;
 
-    localStorage.removeItem("adminToken");
-    localStorage.removeItem("token");
-    localStorage.removeItem("userId");
+    sessionStorage.removeItem("adminToken");
+    sessionStorage.removeItem("token");
+    sessionStorage.removeItem("userId");
 
     toast.success("Logged out successfully");
     navigate("/auth", { replace: true });

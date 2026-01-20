@@ -18,7 +18,7 @@ function Sidebar({ currentPage, onNavigate, sidebarCollapsed, setSidebarCollapse
   ];
 
   const [admin, setAdmin] = useState(null);
-  const adminToken = localStorage.getItem("adminToken");
+  const adminToken = sessionStorage.getItem("adminToken");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -57,9 +57,9 @@ function Sidebar({ currentPage, onNavigate, sidebarCollapsed, setSidebarCollapse
   const handleLogout = () => {
     if (!window.confirm("Are you sure you want to logout?")) return;
     // Clear admin & user session safely
-    localStorage.removeItem("adminToken");
-    localStorage.removeItem("token");
-    localStorage.removeItem("userId");
+    sessionStorage.removeItem("adminToken");
+    sessionStorage.removeItem("token");
+    sessionStorage.removeItem("userId");
     // Redirect to auth page
     toast.success('Logged Out Successfully!')
     navigate("/auth", { replace: true });

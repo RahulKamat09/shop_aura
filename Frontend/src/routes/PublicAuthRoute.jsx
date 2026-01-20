@@ -2,7 +2,7 @@
 import { Navigate } from "react-router-dom";
 
 const PublicAuthRoute = ({ children }) => {
-    const isAuthenticated = !!localStorage.getItem("token");
+    const isAuthenticated = !!sessionStorage.getItem("token");
 
     return isAuthenticated ? <Navigate to="/profile" replace /> : children;
 };

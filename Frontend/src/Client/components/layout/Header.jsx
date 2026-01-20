@@ -10,7 +10,7 @@ const Header = () => {
   const { getCartCount, wishlistItems } = useCart();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const isLoggedIn = !!localStorage.getItem("token");
+  const isLoggedIn = !!sessionStorage.getItem("token");
 
 
   const navigate = useNavigate();

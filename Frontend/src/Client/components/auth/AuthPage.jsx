@@ -78,8 +78,8 @@ const AuthPage = () => {
 
                 toast.success("Account created successfully 🎉");
 
-                localStorage.setItem("token", "user_logged_in");
-                localStorage.setItem("userId", savedUser.id);
+                sessionStorage.setItem("token", "user_logged_in");
+                sessionStorage.setItem("userId", savedUser.id);
             }
 
             /* =============================
@@ -94,7 +94,7 @@ const AuthPage = () => {
                     formData.password === admin.password
                 ) {
                     toast.success("Admin login successful 🎉");
-                    localStorage.setItem("adminToken", "admin_logged_in");
+                    sessionStorage.setItem("adminToken", "admin_logged_in");
 
                     await delay(1000);
                     navigate("/admin", { replace: true });
@@ -116,8 +116,8 @@ const AuthPage = () => {
                     return;
                 }
 
-                localStorage.setItem("token", "user_logged_in");
-                localStorage.setItem("userId", user[0].id);
+                sessionStorage.setItem("token", "user_logged_in");
+                sessionStorage.setItem("userId", user[0].id);
 
                 toast.success("Login successful 🎉");
             }

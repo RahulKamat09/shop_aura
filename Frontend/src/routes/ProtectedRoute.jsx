@@ -6,8 +6,8 @@ import toast from "react-hot-toast";
 const ProtectedRoute = ({ children }) => {
     const location = useLocation();
 
-    const token = localStorage.getItem("token");
-    const userId = localStorage.getItem("userId");
+    const token = sessionStorage.getItem("token");
+    const userId = sessionStorage.getItem("userId");
 
     const [isAllowed, setIsAllowed] = useState(null);
     const hasShownToast = useRef(false); // ✅ prevent duplicate toasts
@@ -67,8 +67,8 @@ const ProtectedRoute = ({ children }) => {
             hasShownToast.current = true;
         }
 
-        localStorage.removeItem("token");
-        localStorage.removeItem("userId");
+        sessionStorage.removeItem("token");
+        sessionStorage.removeItem("userId");
 
         return <Navigate to="/" replace />;
     }

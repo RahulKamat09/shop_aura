@@ -28,8 +28,8 @@ const ProductDetails = () => {
 
   const navigate = useNavigate();
 
-  const token = localStorage.getItem("token");
-  const userId = localStorage.getItem("userId");
+  const token = sessionStorage.getItem("token");
+  const userId = sessionStorage.getItem("userId");
 
   const isLoggedIn = Boolean(token && userId);
 

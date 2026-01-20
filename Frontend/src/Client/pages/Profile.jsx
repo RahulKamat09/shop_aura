@@ -35,7 +35,7 @@ const tabs = [
 
 const Profile = () => {
   const navigate = useNavigate();
-  const userId = localStorage.getItem("userId");
+  const userId = sessionStorage.getItem("userId");
 
   const { wishlistItems, addToCart, removeFromWishlist } = useCart();
 
@@ -244,8 +244,8 @@ const Profile = () => {
   const handleLogout = () => {
     if (!window.confirm("Are you sure you want to logout?")) return;
 
-    localStorage.removeItem("token");
-    localStorage.removeItem("userId");
+    sessionStorage.removeItem("token");
+    sessionStorage.removeItem("userId");
     toast.success("Logged out successfully");
     navigate("/", { replace: true });
   };
