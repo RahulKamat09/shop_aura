@@ -1,6 +1,7 @@
 {
   "name": "json-server-backend",
   "type": "module",
+  "main":"server.js",
   "scripts": {
     "start": "node server.js"
   },
