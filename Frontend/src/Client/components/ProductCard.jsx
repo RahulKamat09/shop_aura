@@ -1,18 +1,23 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Star, Heart, ShoppingCart, Eye } from 'lucide-react';
+import { Star, Heart, ShoppingCart, Eye, CircleCheckBig } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 
 const ProductCard = ({ product }) => {
   const [isHovered, setIsHovered] = useState(false);
   const navigate = useNavigate();
-  const { addToCart, addToWishlist, isInWishlist, removeFromWishlist } = useCart();
+  const { addToCart, addToWishlist, isInWishlist, removeFromWishlist, cartItems } = useCart();
+
+  const isInCart = cartItems.some(item => item.id === product.id);
+
 
   const handleAddToCart = (e) => {
     e.preventDefault();
-    if (!product.inStock) return;
-    addToCart(product);
+    if (!product.inStock || isInCart) return;
+
+    addToCart({ ...product, quantity: 1 });
   };
+
 
   const handleWishlist = (e) => {
     e.preventDefault();
@@ -91,12 +96,18 @@ const ProductCard = ({ product }) => {
         </button>
 
         <button
-          className="product-action-btn"
+          className={`product-action-btn cart-btn ${isInCart ? 'added' : ''}`}
           onClick={handleAddToCart}
-          disabled={!product.inStock}
+          disabled={!product.inStock || isInCart}
+          title={isInCart ? 'Added to cart' : 'Add to cart'}
         >
-          <ShoppingCart size={18} />
+          {isInCart ? (
+            <CircleCheckBig size={18} />
+          ) : (
+            <ShoppingCart size={18} />
+          )}
         </button>
+
 
         <button
           className="product-action-btn"

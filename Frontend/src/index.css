@@ -81,7 +81,7 @@ textarea {
   padding: 0 1rem;
 }
 
-.btn-extra{
+.btn-extra {
   margin-bottom: 10px;
 }
 
@@ -272,6 +272,28 @@ textarea {
   background-color: var(--sale);
   color: white;
 }
+
+.product-action-btn.cart-btn {
+  transition: all 0.2s ease;
+}
+
+/* ✅ When item is added */
+.product-action-btn.cart-btn.added {
+  background-color: #22c55e;
+  color: #ffffff;
+  cursor: not-allowed;
+}
+
+/* Prevent hover effect when disabled */
+.product-action-btn.cart-btn.added:hover {
+  background-color: #22c55e;
+}
+
+/* Optional: softer disabled look */
+.product-action-btn:disabled {
+  opacity: 0.9;
+}
+
 
 .product-info {
   padding: 1rem;

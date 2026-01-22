@@ -38,21 +38,22 @@ export const CartProvider = ({ children }) => {
   const addToCart = (product) => {
     setCartItems(prev => {
       const existing = prev.find(item => item.id === product.id);
-      const addQty = product.quantity ?? 1;
+      const qty = product.quantity ?? 1;
 
       if (existing) {
         toast.success(`${product.name} quantity updated`);
         return prev.map(item =>
           item.id === product.id
-            ? { ...item, quantity: item.quantity + addQty }
+            ? { ...item, quantity: qty }   // 🔥 SET, NOT ADD
             : item
         );
       }
 
       toast.success(`${product.name} added to cart`);
-      return [...prev, { ...product, quantity: addQty }];
+      return [...prev, { ...product, quantity: qty }];
     });
   };
+
 
   // Remove item from cart
   const removeFromCart = (productId) => {

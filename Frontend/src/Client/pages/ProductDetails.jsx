@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import Layout from '../components/layout/Layout';
 import { useCart } from '../context/CartContext';
-import { Star, Heart, Minus, Plus, Truck, Shield, RotateCcw } from 'lucide-react';
+import { Star, Heart, Minus, Plus, Truck, Shield, RotateCcw, CircleCheckBig } from 'lucide-react';
 import ProductCard from '../components/ProductCard';
 import toast from 'react-hot-toast';
 
@@ -22,8 +22,6 @@ const ProductDetails = () => {
   const [averageRating, setAverageRating] = useState(0);
   const [reviewCount, setReviewCount] = useState(0);
   const [loggedInUser, setLoggedInUser] = useState(null);
-
-
 
 
   const navigate = useNavigate();
@@ -45,6 +43,7 @@ const ProductDetails = () => {
     ? cartItems.find(item => item.id === product.id)
     : null;
 
+  const displayQuantity = cartItem ? cartItem.quantity : quantity;
 
   /* ---------------- FETCH PRODUCT BY ID ---------------- */
   useEffect(() => {
@@ -86,14 +85,11 @@ const ProductDetails = () => {
   const handleAddToCart = () => {
     if (!product) return;
 
-    if (cartItem) {
-      // ✅ Increase existing quantity
-      updateQuantity(product.id, cartItem.quantity + quantity);
-      toast.success("Cart updated");
-    } else {
-      // ✅ First add with selected quantity
-      addToCart({ ...product, quantity });
-    }
+    addToCart({
+      ...product,
+      quantity
+    });
+    setQuantity(1);
   };
 
 
@@ -293,26 +289,27 @@ const ProductDetails = () => {
                 <div className="quantity-selector">
                   <button
                     className="quantity-btn"
+                    disabled={!!cartItem}
                     onClick={() => {
-                      if (cartItem) {
-                        updateQuantity(product.id, cartItem.quantity - 1); // 🔔 toast fires
-                      } else {
-                        setQuantity(Math.max(1, quantity - 1));
+                      if (!cartItem) {
+                        setQuantity(q => Math.max(1, q - 1));
                       }
                     }}
                   >
                     <Minus size={16} />
                   </button>
 
-                  <span style={{ width: '3rem', textAlign: 'center' }}>{cartItem ? cartItem.quantity : quantity}</span>
+
+                  <span style={{ width: '3rem', textAlign: 'center' }}>
+                    {displayQuantity}
+                  </span>
 
                   <button
                     className="quantity-btn"
+                    disabled={!!cartItem}
                     onClick={() => {
-                      if (cartItem) {
-                        updateQuantity(product.id, cartItem.quantity + 1); // 🔔 toast fires
-                      } else {
-                        setQuantity(quantity + 1);
+                      if (!cartItem) {
+                        setQuantity(q => q + 1);
                       }
                     }}
                   >
@@ -324,13 +321,29 @@ const ProductDetails = () => {
 
               <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem' }}>
                 <button
-                  className="btn-primary"
+                  className={`btn-primary ${cartItem ? 'btn-added' : ''}`}
                   onClick={handleAddToCart}
-                  disabled={!product.inStock}
-                  style={{ flex: 1, opacity: product.inStock ? 1 : 0.5 }}
+                  disabled={!product.inStock || cartItem}
+                  style={{
+                    flex: 1,
+                    backgroundColor: cartItem ? '#22c55e' : undefined,
+                    borderColor: cartItem ? '#22c55e' : undefined,
+                    cursor: cartItem ? 'not-allowed' : 'pointer'
+                  }}
                 >
-                  {product.inStock ? 'Add to Cart' : 'Out of Stock'}
+                  {!product.inStock ? (
+                    'Out of Stock'
+                  ) : cartItem ? (
+                    <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
+                      <CircleCheckBig size={20} />
+                      Added
+                    </span>
+                  ) : (
+                    'Add to Cart'
+                  )}
                 </button>
+
+
                 <button
                   className="btn-outline"
                   onClick={handleWishlist}

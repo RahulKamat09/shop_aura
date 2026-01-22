@@ -1318,18 +1318,6 @@
   ],
   "addresses": [
     {
-      "id": "addr101",
-      "userId": "u101",
-      "userName": "Rahul Kamat",
-      "address": "Flat 302, Sunrise Apartments",
-      "city": "Ahmedabad",
-      "state": "Gujarat",
-      "zipCode": "380015",
-      "country": "India",
-      "isDefault": true,
-      "createdAt": "2026-01-19T10:30:00Z"
-    },
-    {
       "address": "BLOCK-B-SF-208 OM SHANTI GOLD PLUS-2 VATVA GAMDI ROAD VATVA",
       "city": "AHMEDABAD",
       "state": "Gujarat",
