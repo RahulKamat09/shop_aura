@@ -86,13 +86,11 @@ const ProductDetails = () => {
     if (!product) return;
 
     if (cartItem) {
-      // product already in cart → ADD ONE MORE
       addToCart({
         ...product,
         quantity: cartItem.quantity + 1
       });
     } else {
-      // first time add → SET selected quantity
       addToCart({
         ...product,
         quantity
@@ -117,7 +115,7 @@ const ProductDetails = () => {
       const { data } = await api.get(`/reviews?productId=${product.id}`);
 
       setReviews(data);
-      calculateRatings(data); // 🔥 IMPORTANT
+      calculateRatings(data); 
     } catch (error) {
       toast.error("Failed to load reviews");
     } finally {
@@ -147,7 +145,7 @@ const ProductDetails = () => {
       await api.post("/reviews", {
         ...reviewForm,
         productId: product.id,
-        userId,                // ✅ associate review with user
+        userId,                
         createdAt: new Date().toISOString(),
         adminReply: ""
       });

@@ -615,18 +615,38 @@
     position: absolute;
     top: 24px;
     left: 24px;
+    flex: 1;
     display: flex;
     align-items: center;
-    gap: 6px;
-    color: #555;
-    font-size: 14px;
-    text-decoration: none;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.875rem 1rem;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    background: #ffffff;
+    color: #1e293b;
+    font-size: 0.9rem;
     font-weight: 500;
+    cursor: pointer;
     transition: all 0.3s ease;
+    font-family: inherit;
     z-index: 10;
 }
 
 .auth-back-home:hover {
-    color: #000;
-    transform: translateX(-4px);
-}   
+    border-color: #2563eb;
+    background: #f8fafc;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+@media (max-width: 480px) {
+    .auth-back-home {
+        left: auto;
+        right: 16px;
+        top: 30px;
+        padding: 0.5rem 0.75rem;
+        font-size: 0.75rem;
+        border-radius: 10px;
+    }
+}
