@@ -85,11 +85,19 @@ const ProductDetails = () => {
   const handleAddToCart = () => {
     if (!product) return;
 
-    addToCart({
-      ...product,
-      quantity
-    });
-    setQuantity(1);
+    if (cartItem) {
+      // product already in cart → ADD ONE MORE
+      addToCart({
+        ...product,
+        quantity: cartItem.quantity + 1
+      });
+    } else {
+      // first time add → SET selected quantity
+      addToCart({
+        ...product,
+        quantity
+      });
+    }
   };
 
 
@@ -289,9 +297,10 @@ const ProductDetails = () => {
                 <div className="quantity-selector">
                   <button
                     className="quantity-btn"
-                    disabled={!!cartItem}
                     onClick={() => {
-                      if (!cartItem) {
+                      if (cartItem) {
+                        updateQuantity(product.id, cartItem.quantity - 1);
+                      } else {
                         setQuantity(q => Math.max(1, q - 1));
                       }
                     }}
@@ -299,23 +308,22 @@ const ProductDetails = () => {
                     <Minus size={16} />
                   </button>
 
-
                   <span style={{ width: '3rem', textAlign: 'center' }}>
                     {displayQuantity}
                   </span>
 
                   <button
                     className="quantity-btn"
-                    disabled={!!cartItem}
                     onClick={() => {
-                      if (!cartItem) {
+                      if (cartItem) {
+                        updateQuantity(product.id, cartItem.quantity + 1);
+                      } else {
                         setQuantity(q => q + 1);
                       }
                     }}
                   >
                     <Plus size={16} />
                   </button>
-
                 </div>
               </div>
 
@@ -323,26 +331,29 @@ const ProductDetails = () => {
                 <button
                   className={`btn-primary ${cartItem ? 'btn-added' : ''}`}
                   onClick={handleAddToCart}
-                  disabled={!product.inStock || cartItem}
+                  disabled={!product.inStock}
                   style={{
                     flex: 1,
                     backgroundColor: cartItem ? '#22c55e' : undefined,
-                    borderColor: cartItem ? '#22c55e' : undefined,
-                    cursor: cartItem ? 'not-allowed' : 'pointer'
+                    borderColor: cartItem ? '#22c55e' : undefined
                   }}
                 >
                   {!product.inStock ? (
                     'Out of Stock'
                   ) : cartItem ? (
-                    <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
+                    <span style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '0.5rem'
+                    }}>
                       <CircleCheckBig size={20} />
-                      Added
+                      Added To Cart
                     </span>
                   ) : (
                     'Add to Cart'
                   )}
                 </button>
-
 
                 <button
                   className="btn-outline"

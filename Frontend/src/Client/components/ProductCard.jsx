@@ -13,10 +13,16 @@ const ProductCard = ({ product }) => {
 
   const handleAddToCart = (e) => {
     e.preventDefault();
-    if (!product.inStock || isInCart) return;
+    if (!product.inStock) return;
 
-    addToCart({ ...product, quantity: 1 });
+    const existingItem = cartItems.find(item => item.id === product.id);
+
+    addToCart({
+      ...product,
+      quantity: existingItem ? existingItem.quantity + 1 : 1
+    });
   };
+
 
 
   const handleWishlist = (e) => {
@@ -98,7 +104,7 @@ const ProductCard = ({ product }) => {
         <button
           className={`product-action-btn cart-btn ${isInCart ? 'added' : ''}`}
           onClick={handleAddToCart}
-          disabled={!product.inStock || isInCart}
+          disabled={!product.inStock}
           title={isInCart ? 'Added to cart' : 'Add to cart'}
         >
           {isInCart ? (

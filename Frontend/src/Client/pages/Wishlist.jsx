@@ -1,16 +1,21 @@
 import { Link, useNavigate } from 'react-router-dom';
 import Layout from '../components/layout/Layout';
 import { useCart } from '../context/CartContext';
-import { Heart, ShoppingCart, X, Eye } from 'lucide-react';
+import { Heart, ShoppingCart, X, Eye, CircleCheckBig } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const Wishlist = () => {
-  const { wishlistItems, removeFromWishlist, addToCart } = useCart();
+  const { wishlistItems, removeFromWishlist, addToCart, cartItems } = useCart();
   const navigate = useNavigate();
 
   const handleMoveToCart = (product) => {
-    addToCart(product);
+    addToCart({
+      ...product,
+      quantity:
+        cartItems.find(item => item.id === product.id)?.quantity + 1 || 1
+    });
   };
+
 
   return (
     <Layout>
@@ -68,13 +73,34 @@ const Wishlist = () => {
                     <h4 style={{ fontWeight: '500', marginBottom: '0.5rem' }}>{item.name}</h4>
                     <p style={{ color: 'var(--primary)', fontWeight: '600', fontSize: '1.125rem' }}>${item.price.toFixed(2)}</p>
                     <div className="wishlist-item-actions">
-                      <button
-                        className="btn-primary"
-                        style={{ flex: 1, fontSize: '0.875rem', padding: '0.5rem 1rem' }}
-                        onClick={() => handleMoveToCart(item)}
-                      >
-                        <ShoppingCart size={16} /> Add to Cart
-                      </button>
+                      {(() => {
+                        const isInCart = cartItems.some(cart => cart.id === item.id);
+
+                        return (
+                          <button
+                            className="wishlist-item-actions btn-primary"
+                            style={{
+                              flex: 1,
+                              fontSize: '0.875rem',
+                              padding: '0.5rem 1rem',
+                              backgroundColor: isInCart ? '#22c55e' : undefined,
+                              borderColor: isInCart ? '#22c55e' : undefined
+                            }}
+                            onClick={() => handleMoveToCart(item)}
+                          >
+                            {isInCart ? (
+                              <>
+                                <CircleCheckBig size={16} /> Added
+                              </>
+                            ) : (
+                              <>
+                                <ShoppingCart size={16} /> Add to Cart
+                              </>
+                            )}
+                          </button>
+                        );
+                      })()}
+
                     </div>
                   </div>
                 </div>

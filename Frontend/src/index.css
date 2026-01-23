@@ -279,19 +279,15 @@ textarea {
 
 /* ✅ When item is added */
 .product-action-btn.cart-btn.added {
-  background-color: #22c55e;
-  color: #ffffff;
-  cursor: not-allowed;
+  background-color: white;
+  color: #22c55e;
+  cursor: pointer;
 }
 
 /* Prevent hover effect when disabled */
 .product-action-btn.cart-btn.added:hover {
   background-color: #22c55e;
-}
-
-/* Optional: softer disabled look */
-.product-action-btn:disabled {
-  opacity: 0.9;
+  color: #ffffff;
 }
 
 
@@ -1289,6 +1285,13 @@ textarea {
   display: flex;
   gap: 0.5rem;
   margin-top: 1rem;
+}
+
+.wishlist-item-actions .btn-primary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
 }
 
 /* Filter Sidebar */
